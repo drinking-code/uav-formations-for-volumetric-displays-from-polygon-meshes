@@ -4,7 +4,7 @@ from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
-from hard_corners import calc_corner_sharpness
+from corners_sharpness import calc_corner_sharpness
 from unique_vertices import unique_vertices
 
 """
