@@ -1,12 +1,11 @@
-import numpy as np
 from stl import mesh
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 
 from corners_sharpness import calc_corner_sharpness
 from edges_sharpness import calc_edge_sharpness
-from unique_vertices import unique_vertices
+from pyplot_draw_mesh import draw_corner_sharpness, draw_edge_sharpness, draw_mesh_faces
+from unique_vertices import unique_vertices, unique_edges
 from utils import recursive_list
 
 """
@@ -29,26 +28,18 @@ figure = plt.figure()
 axes = figure.add_subplot(projection='3d', computed_zorder=False)
 
 # find vertices by iterating faces (vertices may appear in more than one face)
-vertices = unique_vertices(recursive_list(mesh.vectors))
+vectors_list = recursive_list(mesh.vectors)
+vertices = unique_vertices(vectors_list)
+edges = unique_edges(vectors_list)
 
 sharpness_corners = calc_corner_sharpness(mesh.vectors)
 sharpness_edges = calc_edge_sharpness(mesh.vectors, mesh.normals)
 
 # plot faces and vertices
-# axes.add_collection3d(
-#     mplot3d.art3d.Poly3DCollection(mesh.vectors, facecolors='w', lw=1, edgecolor=(0, 0, 0), zorder=-1)
-# )
-# color_depth = 256
-# colors = cm.RdBu(np.linspace(0, 1, color_depth))
-# i = 1
-# for vertex in vertices:
-#     vertex_sharpness = sharpness_corners[tuple(vertex)]
-#     if vertex_sharpness < .8:
-#         continue
-#     color_index = int(np.floor(np.interp(vertex_sharpness, (0, 1), (color_depth - 1, 0))))
-#     axes.scatter(vertex[0], vertex[1], vertex[2], color=colors[color_index], zorder=20 + i)
-#     i = i + 1
-#
-# scale = mesh.points.flatten()
-# axes.auto_scale_xyz(scale, scale, scale)
-# plt.show()
+# draw_mesh_faces(mesh.vectors, axes)
+# draw_corner_sharpness(sharpness_corners, axes)
+draw_edge_sharpness(sharpness_edges, axes)
+
+scale = mesh.points.flatten()
+axes.auto_scale_xyz(scale, scale, scale)
+plt.show()
