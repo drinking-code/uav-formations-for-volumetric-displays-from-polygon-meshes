@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from corners_sharpness import calc_corner_sharpness
 from edges_sharpness import calc_edge_sharpness
-from pyplot_draw_mesh import draw_corner_sharpness, draw_edge_sharpness, draw_mesh_faces
+from pyplot_draw_mesh import draw_corner_sharpness, draw_edge_sharpness, draw_mesh_faces, draw_normals
 from unique_vertices import unique_vertices, unique_edges
 from utils import recursive_list
 
@@ -22,24 +22,30 @@ from utils import recursive_list
 7. (Optional) perform checks
 """
 
-mesh = mesh.Mesh.from_file('monkey.stl')
+mesh = mesh.Mesh.from_file('sword.stl')
 
 figure = plt.figure()
 axes = figure.add_subplot(projection='3d', computed_zorder=False)
 
 # find vertices by iterating faces (vertices may appear in more than one face)
-vectors_list = recursive_list(mesh.vectors)
+# faces = 20
+vectors = mesh.vectors
+normals = mesh.normals
+vectors_list = recursive_list(vectors)
 vertices = unique_vertices(vectors_list)
 edges = unique_edges(vectors_list)
 
-sharpness_corners = calc_corner_sharpness(mesh.vectors)
-sharpness_edges = calc_edge_sharpness(mesh.vectors, mesh.normals)
+sharpness_corners = calc_corner_sharpness(vectors)
+sharpness_edges = calc_edge_sharpness(vectors, normals)
 
 # plot faces and vertices
 # draw_mesh_faces(mesh.vectors, axes)
-# draw_corner_sharpness(sharpness_corners, axes)
+draw_corner_sharpness(sharpness_corners, axes)
 draw_edge_sharpness(sharpness_edges, axes)
+draw_normals(vectors, normals, axes, .5)
 
-scale = mesh.points.flatten()
-axes.auto_scale_xyz(scale, scale, scale)
+scale = 8
+axes.set_xlim3d(scale / -2, scale / 2)
+axes.set_ylim3d(scale / -2, scale / 2)
+axes.set_zlim3d(0, scale)
 plt.show()

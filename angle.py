@@ -16,6 +16,6 @@ def angle_between_vectors_anchor(vector_u, vector_v, vector_anchor=None):
     cos_θ = np.clip(cos_θ, -1, 1)
     θ_rad = np.arccos(cos_θ)
     θ = np.degrees(θ_rad)
-    while θ > 90:
-        θ -= 90
+    if θ > 180:
+        θ = (180 - θ) * -1
     return θ

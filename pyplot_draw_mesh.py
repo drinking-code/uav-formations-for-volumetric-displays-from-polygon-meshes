@@ -1,3 +1,5 @@
+from functools import reduce
+
 import numpy as np
 from matplotlib import cm
 from mpl_toolkits.mplot3d import art3d
@@ -35,3 +37,22 @@ def draw_corner_sharpness(sharpness_corners, axes):
         color_index = int(np.floor(np.interp(vertex_sharpness, (0, 1), (color_depth - 1, 0))))
         axes.scatter(vertex[0], vertex[1], vertex[2], color=colors[color_index], zorder=20 + i)
         i = i + 1
+
+
+def center_of_triangle(face):
+    def sum_of_nth_values(n, lists):
+        return reduce(lambda a, b: a + b, map(lambda list: list[n], lists)) / 3
+
+    return [
+        sum_of_nth_values(0, face),
+        sum_of_nth_values(1, face),
+        sum_of_nth_values(2, face)
+    ]
+
+
+def draw_normals(faces, normals, axes, size=1):
+    for face, normal in zip(faces, normals):
+        x, y, z = center_of_triangle(face)
+        magnitude = np.linalg.norm(normal)
+        u, v, w = normal / magnitude * size
+        axes.quiver(x, y, z, u, v, w)
