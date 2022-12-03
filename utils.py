@@ -3,7 +3,10 @@ def return_value(value):
 
 
 def list_contains(list_subject, value, transform=return_value):
-    return list(map(lambda subject: transform(subject) == value, list_subject))
+    for subject in list_subject:
+        if transform(subject) == value:
+            return True
+    return False
 
 
 def lists_list_filter_contains(lists_subject, value):
@@ -13,7 +16,7 @@ def lists_list_filter_contains(lists_subject, value):
     :param value: vector to find
     :return: list of lists of vectors that contain the vector
     """
-    return list(filter(lambda subject: any(list_contains(subject, value)), lists_subject))
+    return list(filter(lambda subject: list_contains(subject, value), lists_subject))
 
 
 def recursive_list(iterable):
@@ -25,7 +28,7 @@ def recursive_list(iterable):
 
 def is_iterable(value):
     try:
-        value_iterator = iter(value)
+        iter(value)
         return True
     except TypeError as te:
         return False
