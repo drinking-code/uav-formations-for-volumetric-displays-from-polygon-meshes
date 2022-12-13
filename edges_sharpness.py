@@ -8,7 +8,6 @@ from utils import recursive_list, list_contains
 def calc_edge_sharpness(faces):
     """
     :param faces: list of faces, each of which is a list containing all its vertices
-    :param normals: list of normals for each face
     :returns: dictionary with sharpness value from 0 to 1 for each unique edge given in faces
     """
     faces = recursive_list(faces)
@@ -50,13 +49,13 @@ def calc_single_edge_sharpness(edge, faces):
     elif len(projected_vectors_of_faces_with_edge) < 2:
         return 1
 
-    normal_angle = angle_between_vectors_anchor(
+    θ = angle_between_vectors_anchor(
         projected_vectors_of_faces_with_edge[0],
         projected_vectors_of_faces_with_edge[1]
     )
 
     # in case of single flipped angle
-    while normal_angle >= 180:
-        normal_angle -= 180
+    while θ >= 180:
+        θ -= 180
 
-    return np.interp(normal_angle, (0, 180), (1, 0))
+    return np.interp(θ, (0, 180), (1, 0))

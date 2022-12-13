@@ -32,3 +32,21 @@ def is_iterable(value):
         return True
     except TypeError as te:
         return False
+
+
+def get_faces_with_vertex_dict(mesh):
+    faces_with_vertex = {}
+    for face in mesh:
+        for vertex in face:
+            vertex = tuple(vertex)
+            if vertex not in faces_with_vertex:
+                faces_with_vertex[vertex] = []
+            faces_with_vertex[vertex].append(face)
+    return faces_with_vertex
+
+
+def replace_values_in_list(target, replacement):
+    for index in enumerate(target):
+        if type(target[index]) is list:
+            replace_values_in_list(target[index], replacement[index])
+        target[index] = replacement[index]

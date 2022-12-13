@@ -1,7 +1,7 @@
-from stl import mesh
-from mpl_toolkits import mplot3d
+from stl import mesh as np_stl
 import matplotlib.pyplot as plt
 
+from collapse_vertices import collapse_vertices
 from corners_sharpness import calc_corner_sharpness
 from edges_sharpness import calc_edge_sharpness
 from pyplot_draw_mesh import draw_corner_sharpness, draw_edge_sharpness, draw_mesh_faces, draw_normals
@@ -22,7 +22,8 @@ from utils import recursive_list
 7. (Optional) perform checks
 """
 
-mesh = mesh.Mesh.from_file('sword.stl')
+# mesh = mesh.Mesh.from_file('sword.stl')
+mesh = np_stl.Mesh.from_file('sword_double_tip.stl')
 
 figure = plt.figure()
 axes = figure.add_subplot(projection='3d', computed_zorder=False)
@@ -43,9 +44,11 @@ sharpness_edges = calc_edge_sharpness(vectors)
 # plot faces and vertices
 # draw_mesh_faces(mesh.vectors, axes)
 draw_corner_sharpness(sharpness_corners, axes)
-print(sharpness_edges)
+# print(sharpness_edges)
 draw_edge_sharpness(sharpness_edges, axes)
 # draw_normals(vectors, normals, axes, .5)
+
+vectors = collapse_vertices(sharpness_corners, vectors, .1, .1, axes)
 
 scale = 8
 axes.set_xlim3d(scale / -2, scale / 2)
