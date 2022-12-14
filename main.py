@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from collapse_vertices import collapse_vertices
 from corners_sharpness import calc_corner_sharpness
 from edges_sharpness import calc_edge_sharpness
+from mesh import Mesh
 from pyplot_draw_mesh import draw_corner_sharpness, draw_edge_sharpness, draw_mesh_faces, draw_normals
 from unique_vertices import unique_vertices, unique_edges
 from utils import recursive_list
@@ -34,24 +35,25 @@ axes.set_proj_type('persp', focal_length=0.2)
 # faces = 20
 vectors = mesh.vectors
 normals = mesh.normals
-vectors_list = recursive_list(vectors)
-vertices = unique_vertices(vectors_list)
-edges = unique_edges(vectors_list)
+mesh = Mesh(mesh)
+# vectors_list = recursive_list(vectors)
+# vertices = unique_vertices(vectors_list)
+# edges = unique_edges(vectors_list)
 
-sharpness_corners = calc_corner_sharpness(vectors)
-sharpness_edges = calc_edge_sharpness(vectors)
+mesh.set_vertex_data(calc_corner_sharpness(mesh), 'sharpness')
+mesh.set_edge_data(calc_edge_sharpness(mesh), 'sharpness')
 
 # plot faces and vertices
 # draw_mesh_faces(mesh.vectors, axes)
-draw_corner_sharpness(sharpness_corners, axes)
+# draw_corner_sharpness(sharpness_corners, axes)
 # print(sharpness_edges)
-draw_edge_sharpness(sharpness_edges, axes)
+# draw_edge_sharpness(sharpness_edges, axes)
 # draw_normals(vectors, normals, axes, .5)
 
-vectors = collapse_vertices(sharpness_corners, vectors, .1, .1, axes)
+collapse_vertices(mesh, .1, .1, axes)
 
 scale = 8
 axes.set_xlim3d(scale / -2, scale / 2)
 axes.set_ylim3d(scale / -2, scale / 2)
 axes.set_zlim3d(0, scale)
-plt.show()
+# plt.show()

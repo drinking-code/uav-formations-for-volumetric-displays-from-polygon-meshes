@@ -7,25 +7,23 @@ from unique_vertices import unique_vertices as calc_unique_vertices
 from utils import lists_list_filter_contains, recursive_list
 
 
-def calc_corner_sharpness(vertices):
+def calc_corner_sharpness(mesh):
     """
-    :param vertices: list of lists which each contain all vertices forming a face
+    :param mesh: list of lists which each contain all vertices forming a face
     :returns: dictionary with sharpness value from 0 to 1 for each unique vertex given in vertices
     """
-    vertices = recursive_list(vertices)
-    unique_vertices = calc_unique_vertices(vertices)
-    sharpness_values = {tuple(vertex): calc_single_corner_sharpness(vertex, vertices) for vertex in unique_vertices}
+    sharpness_values = {tuple(vertex): calc_single_corner_sharpness(vertex, mesh.faces) for vertex in mesh.vertices}
     return sharpness_values
 
 
-def calc_single_corner_sharpness(vertex, vertices):
+def calc_single_corner_sharpness(vertex, faces):
     """
     :param vertex: vertex for which the sharpness shall be returned
-    :param vertices: list of lists which each contain all vertices forming a face
+    :param faces: list of lists which each contain all vertices forming a face
     :returns: sharpness value from 0 to 1
     """
     vertex = list(vertex)
-    connected_vertices = get_connected_vertices(vertex, vertices)
+    connected_vertices = get_connected_vertices(vertex, faces)
     connected_vertices_angles = [
         angle_between_vectors_anchor(connected_vertex[0], connected_vertex[1], vertex)
         for connected_vertex in connected_vertices
@@ -37,13 +35,13 @@ def calc_single_corner_sharpness(vertex, vertices):
     return sharpness
 
 
-def get_connected_vertices(vertex, vertices):
+def get_connected_vertices(vertex, faces):
     """
     :param vertex: vertex for which the connected vertices shall be returned
-    :param vertices: list of lists which each contain all vertices forming a face
+    :param faces: list of lists which each contain all vertices forming a face
     :returns: list of lists with each two vertices that are adjacent to the given vertex in a face
     """
-    faces_with_vertex = lists_list_filter_contains(vertices, vertex)
+    faces_with_vertex = lists_list_filter_contains(faces, vertex)
     # copy faces
     faces_with_vertex = recursive_list(faces_with_vertex)
     for face in faces_with_vertex:

@@ -26,6 +26,13 @@ def recursive_list(iterable):
     return list(iterable)
 
 
+def recursive_tuple(iterable):
+    if not is_iterable(iterable):
+        return iterable
+    iterable = map(lambda value: recursive_tuple(value), iterable)
+    return tuple(iterable)
+
+
 def is_iterable(value):
     try:
         iter(value)

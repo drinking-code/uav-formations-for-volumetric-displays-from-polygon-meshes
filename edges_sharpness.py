@@ -5,17 +5,15 @@ from unique_vertices import unique_edges as calc_unique_edges
 from utils import recursive_list, list_contains
 
 
-def calc_edge_sharpness(faces):
+def calc_edge_sharpness(mesh):
     """
-    :param faces: list of faces, each of which is a list containing all its vertices
+    :param mesh: list of faces, each of which is a list containing all its vertices
     :returns: dictionary with sharpness value from 0 to 1 for each unique edge given in faces
     """
-    faces = recursive_list(faces)
-    unique_edges = calc_unique_edges(faces)
     sharpness_values = {
         tuple(map(lambda vertex: tuple(vertex), edge)):
-            calc_single_edge_sharpness(edge, faces)
-        for edge in unique_edges
+            calc_single_edge_sharpness(edge, mesh.faces)
+        for edge in mesh.edges
     }
     return sharpness_values
 
