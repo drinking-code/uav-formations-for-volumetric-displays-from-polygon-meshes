@@ -1,3 +1,6 @@
+from pprint import pprint
+
+
 class DoubleSidedMap:
     def __init__(self, dictionary, make_hashable):
         self.make_hashable = make_hashable
@@ -20,7 +23,7 @@ class DoubleSidedMap:
         return other_hashable in self.value_key or other_hashable in self.key_value
 
     def __getitem__(self, key):
-        key_hashable = self.make_hashable(key)
+        key_hashable = try_to_otherwise_return_value(self.make_hashable, key)
         if key_hashable in self.key_value:
             return self.key_value[key_hashable]
         elif key_hashable in self.value_key:
@@ -29,12 +32,13 @@ class DoubleSidedMap:
             return None
 
     def __setitem__(self, key, value):
-        del self[key]
+        if key in self.key_value:
+            del self[key]
         self.key_value[key] = value
         self.value_key[self.make_hashable(value)] = key
 
     def __delitem__(self, key):
-        key_hashable = self.make_hashable(key)
+        key_hashable = try_to_otherwise_return_value(self.make_hashable, key)
         original_value = self.key_value[key_hashable]
         del self.value_key[self.make_hashable(original_value)]
         del self.key_value[key_hashable]
@@ -43,3 +47,10 @@ class DoubleSidedMap:
         for key, value in other:
             self.value_key[self.make_hashable(value)] = key
             self.key_value[key] = value
+
+
+def try_to_otherwise_return_value(function, value):
+    try:
+        value = function(value)
+    finally:
+        return value

@@ -53,7 +53,7 @@ def get_faces_with_vertex_dict(mesh):
 
 
 def replace_values_in_list(target, replacement):
-    for index in enumerate(target):
-        if type(target[index]) is list:
-            replace_values_in_list(target[index], replacement[index])
+    for index, value in enumerate(target):
+        if type(value) is list:
+            replace_values_in_list(value, replacement[index])
         target[index] = replacement[index]

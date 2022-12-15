@@ -3,27 +3,30 @@ from pprint import pprint
 
 from double_sided_dict import DoubleSidedMap
 from unique_vertices import unique_edges as calc_unique_edges, unique_vertices as calc_unique_vertices
-from utils import return_value, replace_values_in_list, recursive_list, recursive_tuple
+from utils import return_value, recursive_list, recursive_tuple
 
 
 class Mesh:
     def __init__(self, data):
         self.faces = recursive_list(data.vectors)
-        self.edges = calc_unique_edges(self.faces)
-        self.vertices = calc_unique_vertices(self.faces)
         self.normals = recursive_list(data.normals)
 
-        self.vertex_data = {}
-        self.edge_data = {}
-
+        self.vertices = calc_unique_vertices(self.faces)
         self.vertices_map = DoubleSidedMap(
             {random.randint(0, 2 ** 32): edge for edge in self.vertices},
             tuple
         )
+        # some vertices have multiple existence, i.e. different lists (instances) with same values
+        dedupe_verts_in_faces(self.vertices_map, self.faces)
+
+        self.edges = calc_unique_edges(self.faces)
         self.edges_map = DoubleSidedMap(
             {random.randint(0, 2 ** 32): edge for edge in self.edges},
             recursive_tuple
         )
+
+        self.vertex_data = {}
+        self.edge_data = {}
 
     def set_edge_data(self, dictionary, key, merge=True):
         """
@@ -43,7 +46,7 @@ class Mesh:
         :param key:
         :return: dict with edge (tuple of two tuple-vertices) as keys
         """
-        return translate_dict(self.edge_data[key], self.edges_map.key_value, tuple)
+        return translate_dict(self.edge_data[key], self.edges_map.key_value, recursive_tuple)
 
     def set_vertex_data(self, dictionary, key, merge=True):
         """
@@ -65,44 +68,13 @@ class Mesh:
         """
         return translate_dict(self.vertex_data[key], self.vertices_map.key_value, tuple)
 
-    def move_vector(self, vector, target):
-        vector_key = self.vertices_map[vector]
-        vector_ref = self.vertices_map[vector_key]
-        replace_values_in_list(vector_ref, target)
-        # reassign new value
-        self.vertices_map[vector_key] = vector_ref
+    from .mesh_vector_manipulation import move_vertex, replace_vertices
 
-    def replace_vectors(self, vectors, target):
-        # find and remove edges between given vectors
-        # find edges that contain one of the given vectors -> interpolate values
-        vectors = recursive_list(vectors)
-        edges_in_vector_group = []
-        for index, vector_a in enumerate(vectors):
-            for vector_b in vectors[index:]:
-                edge_key = None
-                if [vector_a, vector_b] in self.edges_map:
-                    edge_key = self.edges_map[[vector_a, vector_b]]
-                if [vector_b, vector_a] in self.edges_map:
-                    edge_key = self.edges_map[[vector_b, vector_a]]
-                if edge_key is None:
-                    continue
-                edges_in_vector_group.append(edge_key)
-                for key in self.edge_data:
-                    del self.edge_data[key][edge_key]
 
-        edges_half_in_vector_group = {}
-        for edge_id, edge_key in self.edges_map:
-            edge_key = list(edge_key)
-            existing_vector_filter = list(filter(lambda vertex: vertex in vectors, edge_key))
-            if len(existing_vector_filter) != 1:
-                continue
-            edge_vector_outside_vectors = list(filter(lambda vertex: vertex is not existing_vector_filter[0], edge_key))[0]
-            edge_vector_outside_vectors_tuple = tuple(edge_vector_outside_vectors)
-            if edge_vector_outside_vectors_tuple not in edges_half_in_vector_group:
-                edges_half_in_vector_group[edge_vector_outside_vectors_tuple] = []
-            edges_half_in_vector_group[edge_vector_outside_vectors_tuple].append(edge_key)
-
-        pprint(edges_half_in_vector_group)
+def dedupe_verts_in_faces(vertices_map, faces):
+    for face in faces:
+        for index, vertex in enumerate(face):
+            face[index] = vertices_map[vertices_map[vertex]]
 
 
 def translate_dict(from_dict, key_key_map, to_key_transformation=return_value):

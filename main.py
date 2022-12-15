@@ -32,28 +32,24 @@ axes = figure.add_subplot(projection='3d', computed_zorder=False)
 axes.set_proj_type('persp', focal_length=0.2)
 
 # find vertices by iterating faces (vertices may appear in more than one face)
-# faces = 20
 vectors = mesh.vectors
 normals = mesh.normals
 mesh = Mesh(mesh)
-# vectors_list = recursive_list(vectors)
-# vertices = unique_vertices(vectors_list)
-# edges = unique_edges(vectors_list)
 
-mesh.set_vertex_data(calc_corner_sharpness(mesh), 'sharpness')
-mesh.set_edge_data(calc_edge_sharpness(mesh), 'sharpness')
+sharpness_key = 'sharpness'
+mesh.set_vertex_data(calc_corner_sharpness(mesh), sharpness_key)
+mesh.set_edge_data(calc_edge_sharpness(mesh), sharpness_key)
 
 # plot faces and vertices
-# draw_mesh_faces(mesh.vectors, axes)
-# draw_corner_sharpness(sharpness_corners, axes)
-# print(sharpness_edges)
-# draw_edge_sharpness(sharpness_edges, axes)
-# draw_normals(vectors, normals, axes, .5)
+# draw_mesh_faces(mesh.faces, axes)
+# draw_corner_sharpness(mesh.get_vertex_data(sharpness_key), axes)
+# draw_edge_sharpness(mesh.get_edge_data(sharpness_key), axes)
+# draw_normals(mesh.faces, mesh.normals, axes, .5)
 
 collapse_vertices(mesh, .1, .1, axes)
 
 scale = 8
-axes.set_xlim3d(scale / -2, scale / 2)
-axes.set_ylim3d(scale / -2, scale / 2)
-axes.set_zlim3d(0, scale)
+# axes.set_xlim3d(scale / -2, scale / 2)
+# axes.set_ylim3d(scale / -2, scale / 2)
+# axes.set_zlim3d(0, scale)
 # plt.show()

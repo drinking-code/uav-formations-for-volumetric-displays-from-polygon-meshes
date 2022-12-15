@@ -30,5 +30,5 @@ def collapse_vertices(mesh, sharpness_threshold, minimum_distance, axes):
 
             middle_point = np.average([list(vertex_to_compare), list(vertex_subject)], axis=0)
             print(vertex_subject, vertex_to_compare, middle_point)
-            mesh.replace_vectors([vertex_subject, vertex_to_compare], middle_point)
+            mesh.replace_vertices([vertex_subject, vertex_to_compare], middle_point)
             axes.scatter(middle_point[0], middle_point[1], middle_point[2], color='black', zorder=20)

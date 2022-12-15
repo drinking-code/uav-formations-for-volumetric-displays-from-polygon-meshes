@@ -22,7 +22,7 @@ def unique_edges(faces):
                 if vertex_a == vertex_b:
                     continue
                 edge = [vertex_a, vertex_b]
-                is_in_edges = list_contains(edges, edge)
+                is_in_edges = list_contains(edges, edge) or list_contains(edges, [vertex_b, vertex_a])
                 if is_in_edges:
                     continue
                 edges.append(edge)
