@@ -57,3 +57,10 @@ def replace_values_in_list(target, replacement):
         if type(value) is list:
             replace_values_in_list(value, replacement[index])
         target[index] = replacement[index]
+
+
+def zip_common(*dicts):
+    if not dicts:
+        return
+    for i in set(dicts[0]).intersection(*dicts[1:]):
+        yield (i,) + tuple(d[i] for d in dicts)

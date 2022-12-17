@@ -18,6 +18,16 @@ class DoubleSidedMap:
         self.key_value.clear()
         self.value_key.clear()
 
+    def find_by_value(self, is_desired, find_all=False):
+        found = {}
+        for value in self.key_value.values():
+            if not is_desired(value):
+                continue
+            found[self[value]] = self[self[value]]
+            if not find_all:
+                return found
+        return found
+
     def __contains__(self, other):
         other_hashable = self.make_hashable(other)
         return other_hashable in self.value_key or other_hashable in self.key_value

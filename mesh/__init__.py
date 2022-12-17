@@ -2,6 +2,7 @@ import random
 from pprint import pprint
 
 from double_sided_dict import DoubleSidedMap
+from mesh.dedupe_verts_in_faces import dedupe_verts_in_faces
 from unique_vertices import unique_edges as calc_unique_edges, unique_vertices as calc_unique_vertices
 from utils import return_value, recursive_list, recursive_tuple
 
@@ -69,12 +70,6 @@ class Mesh:
         return translate_dict(self.vertex_data[key], self.vertices_map.key_value, tuple)
 
     from .mesh_vector_manipulation import move_vertex, replace_vertices
-
-
-def dedupe_verts_in_faces(vertices_map, faces):
-    for face in faces:
-        for index, vertex in enumerate(face):
-            face[index] = vertices_map[vertices_map[vertex]]
 
 
 def translate_dict(from_dict, key_key_map, to_key_transformation=return_value):

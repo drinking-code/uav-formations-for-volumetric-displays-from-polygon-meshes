@@ -1,9 +1,9 @@
 import numpy as np
 
-from utils import get_faces_with_vertex_dict, recursive_list
+from utils import get_faces_with_vertex_dict
 
 
-def collapse_vertices(mesh, sharpness_threshold, minimum_distance, axes):
+def collapse_vertices(mesh, sharpness_threshold, minimum_distance):
     faces_with_vertex = get_faces_with_vertex_dict(mesh.faces)
     # filter out non-sharp vertices
     faces_with_vertex = {
@@ -29,6 +29,4 @@ def collapse_vertices(mesh, sharpness_threshold, minimum_distance, axes):
                 continue
 
             middle_point = np.average([list(vertex_to_compare), list(vertex_subject)], axis=0)
-            print(vertex_subject, vertex_to_compare, middle_point)
             mesh.replace_vertices([vertex_subject, vertex_to_compare], middle_point)
-            axes.scatter(middle_point[0], middle_point[1], middle_point[2], color='black', zorder=20)

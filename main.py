@@ -40,16 +40,16 @@ sharpness_key = 'sharpness'
 mesh.set_vertex_data(calc_corner_sharpness(mesh), sharpness_key)
 mesh.set_edge_data(calc_edge_sharpness(mesh), sharpness_key)
 
+collapse_vertices(mesh, .1, .1)
+
 # plot faces and vertices
 # draw_mesh_faces(mesh.faces, axes)
-# draw_corner_sharpness(mesh.get_vertex_data(sharpness_key), axes)
-# draw_edge_sharpness(mesh.get_edge_data(sharpness_key), axes)
+draw_corner_sharpness(mesh.get_vertex_data(sharpness_key), axes)
+draw_edge_sharpness(mesh.get_edge_data(sharpness_key), axes)
 # draw_normals(mesh.faces, mesh.normals, axes, .5)
 
-collapse_vertices(mesh, .1, .1, axes)
-
 scale = 8
-# axes.set_xlim3d(scale / -2, scale / 2)
-# axes.set_ylim3d(scale / -2, scale / 2)
-# axes.set_zlim3d(0, scale)
-# plt.show()
+axes.set_xlim3d(scale / -2, scale / 2)
+axes.set_ylim3d(scale / -2, scale / 2)
+axes.set_zlim3d(0, scale)
+plt.show()
