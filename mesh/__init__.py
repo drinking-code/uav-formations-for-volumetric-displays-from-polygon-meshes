@@ -40,7 +40,7 @@ class Mesh:
             self.edge_data[key].clear()
         if key not in self.edge_data:
             self.edge_data[key] = {}
-        self.edge_data[key] = translate_dict(dictionary, self.edges_map.value_key)
+        self.edge_data[key] |= translate_dict(dictionary, self.edges_map.value_key)
 
     def get_edge_data(self, key):
         """
