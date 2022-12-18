@@ -38,5 +38,4 @@ def collapse_vertices(mesh, sharpness_threshold, minimum_distance):
         if len(vertex_group) > 1:
             collapsed_vertices.extend(vertex_group)
             middle_point = np.average(vertex_group, axis=0)
-            print(vertex_group, middle_point)
             mesh.replace_vertices(vertex_group, middle_point)

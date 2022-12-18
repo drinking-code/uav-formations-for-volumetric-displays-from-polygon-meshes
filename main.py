@@ -6,6 +6,7 @@ from corners_sharpness import calc_corner_sharpness
 from edges_sharpness import calc_edge_sharpness
 from mesh import Mesh
 from pyplot_draw_mesh import draw_corner_sharpness, draw_edge_sharpness
+from uav_formation import UAVFormation
 
 """
 4. Distribute points on hard corners (vertices)
@@ -36,6 +37,11 @@ mesh.set_edge_data(calc_edge_sharpness(mesh), sharpness_key)
 3. Reduce hard corners that are too close
 """
 collapse_vertices(mesh, .1, .1)
+
+"""
+Create formation structure
+"""
+formation = UAVFormation()
 
 # plot faces and vertices
 figure = plt.figure()
