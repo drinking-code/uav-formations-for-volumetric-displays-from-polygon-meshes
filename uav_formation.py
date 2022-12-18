@@ -1,7 +1,7 @@
-from combined_dicts import CombinedDicts
+from combined_dict import CombinedDict
 
 
-class UAVFormation(CombinedDicts):
+class UAVFormation(CombinedDict):
     positions = 'positions'
     colors = 'colors'
 

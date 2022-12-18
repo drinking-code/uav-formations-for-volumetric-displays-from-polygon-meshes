@@ -1,9 +1,12 @@
 from utils import list_contains, force_get_item
 
 
-class CombinedDicts:
+class CombinedDict:
     """
-    Multiple values for one key
+    Multiple values for one key.
+    Each key has (the same) categories of values, which are set when calling __init__().
+    Each category has an entry for each existing key (can be None if no value was set for key-category combination)
+    Get and set with syntax `my_combined_dict[<key>][<category>]` or `my_combined_dict[<category>][<key>]`
     """
 
     def __init__(self, categories):
