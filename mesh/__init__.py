@@ -70,6 +70,7 @@ class Mesh:
         return translate_dict(self.vertex_data[key], self.vertices_map.key_value, tuple)
 
     from .mesh_vector_manipulation import move_vertex, replace_vertices
+    from .find_entries import find_vertex
 
 
 def translate_dict(from_dict, key_key_map, to_key_transformation=return_value):

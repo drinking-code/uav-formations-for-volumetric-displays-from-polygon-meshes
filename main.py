@@ -7,6 +7,7 @@ from edges_sharpness import calc_edge_sharpness
 from mesh import Mesh
 from pyplot_draw_mesh import draw_corner_sharpness, draw_edge_sharpness
 from uav_formation import UAVFormation
+from utils import get_faces_with_vertex_dict
 
 """
 4. Distribute points on hard corners (vertices)
@@ -17,11 +18,15 @@ from uav_formation import UAVFormation
 7. (Optional) perform checks
 """
 
+MAX_SHARPNESS = .1
+MIN_DISTANCE = .1
+
 """
 1. Load data / convert into standardised format
 """
 # mesh = mesh.Mesh.from_file('sword.stl')
-mesh = np_stl.Mesh.from_file('sword_double_tip.stl')
+# mesh = np_stl.Mesh.from_file('sword_double_tip.stl')
+mesh = np_stl.Mesh.from_file('sword_double_tip_ascii.stl')
 mesh = Mesh(mesh)
 
 """
@@ -36,12 +41,14 @@ mesh.set_edge_data(calc_edge_sharpness(mesh), sharpness_key)
 """
 3. Reduce hard corners that are too close
 """
-collapse_vertices(mesh, .1, .1)
+collapse_vertices(mesh, MAX_SHARPNESS, MIN_DISTANCE)
 
 """
 Create formation structure
 """
 formation = UAVFormation()
+
+sharp_vertices = mesh.find_vertex(lambda vertex: mesh.get_vertex_data('sharpness')[tuple(vertex)] > MAX_SHARPNESS, True)
 
 # plot faces and vertices
 figure = plt.figure()

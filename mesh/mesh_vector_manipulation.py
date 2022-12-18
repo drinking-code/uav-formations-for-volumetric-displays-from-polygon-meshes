@@ -10,9 +10,13 @@ def move_vertex(self, vertex, target):
     def edge_has_vertex(edge):
         return list_contains(recursive_list(edge), vertex)
 
+    target = list(target)
     # get refs to vertex and delete key (baked tuple)
     vertex_key = self.vertices_map[vertex]
     vertex_ref = self.vertices_map[vertex_key]
+    # remove vertices that existed with the target coordinates to prevent duplicates
+    for vertex_id in self.vertices_map.find_by_value(lambda vertex: vertex == target, True):
+        del self.vertices_map[vertex_id]
     del self.vertices_map[vertex_key]
     # get edges with vertex and delete keys (baked tuples)
     edges_with_vertex = self.edges_map.find_by_value(edge_has_vertex, True)
