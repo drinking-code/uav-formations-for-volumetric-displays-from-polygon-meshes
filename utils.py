@@ -42,6 +42,11 @@ def is_iterable(value):
 
 
 def get_faces_with_vertex_dict(mesh):
+    """
+    Returns a dictionary with all occurring vertices as keys and a list of faces that include a vertex as values
+    :param mesh:
+    :return:
+    """
     faces_with_vertex = {}
     for face in mesh:
         for vertex in face:

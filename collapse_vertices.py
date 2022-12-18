@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import get_faces_with_vertex_dict
+from utils import get_faces_with_vertex_dict, recursive_list, list_contains
 
 
 def collapse_vertices(mesh, sharpness_threshold, minimum_distance):
@@ -12,21 +12,31 @@ def collapse_vertices(mesh, sharpness_threshold, minimum_distance):
         if mesh.get_vertex_data('sharpness')[vertex] > sharpness_threshold
     }
 
-    # todo: find "groups" of close vertices
     # find the middle (average) for each group
     # collapse group into middle
 
     # what about larger clusters where the two farthest points are farther away than threshold
     # -> unlikely to exist because clusters are filtered by sharpness
 
-    sharp_vertices = list(faces_with_vertex.keys())
+    sharp_vertices = recursive_list(faces_with_vertex.keys())
+    collapsed_vertices = []
     for index, vertex_subject in enumerate(sharp_vertices):
+        if list_contains(collapsed_vertices, vertex_subject):
+            continue
+        vertex_group = [vertex_subject]
         for vertex_to_compare in sharp_vertices[index:]:
+            if list_contains(collapsed_vertices, vertex_to_compare):
+                continue
             if vertex_subject == vertex_to_compare:
                 continue
             distance = np.linalg.norm(np.subtract(vertex_to_compare, vertex_subject))
             if distance >= minimum_distance:
                 continue
+            vertex_group.append(vertex_to_compare)
 
-            middle_point = np.average([list(vertex_to_compare), list(vertex_subject)], axis=0)
-            mesh.replace_vertices([vertex_subject, vertex_to_compare], middle_point)
+        # vertex_subject will only be moved if other vertices that are too close are found
+        if len(vertex_group) > 1:
+            collapsed_vertices.extend(vertex_group)
+            middle_point = np.average(vertex_group, axis=0)
+            print(vertex_group, middle_point)
+            mesh.replace_vertices(vertex_group, middle_point)

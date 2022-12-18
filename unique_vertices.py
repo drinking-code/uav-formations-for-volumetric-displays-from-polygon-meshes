@@ -15,7 +15,6 @@ def unique_vertices(faces):
 
 def unique_edges(faces):
     edges = []
-    # print(faces)
     for face in faces:
         for index, vertex_a in enumerate(face):
             for vertex_b in face[index:]:
