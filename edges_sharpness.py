@@ -51,9 +51,4 @@ def calc_single_edge_sharpness(edge, faces):
         projected_vectors_of_faces_with_edge[0],
         projected_vectors_of_faces_with_edge[1]
     )
-
-    # in case of single flipped angle
-    while θ >= 180:
-        θ -= 180
-
     return np.interp(θ, (0, 180), (1, 0))

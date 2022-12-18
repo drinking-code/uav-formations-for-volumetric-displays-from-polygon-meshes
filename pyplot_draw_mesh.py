@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import art3d
 
 from utils import recursive_list
 
-color_scale_name = 'RdBu_r'
+color_scale_name = 'plasma'
 color_depth = 256
 colors = getattr(cm, color_scale_name)(np.linspace(1, 0, color_depth))
 

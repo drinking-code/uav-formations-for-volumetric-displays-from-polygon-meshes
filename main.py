@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from stl import mesh as np_stl
 import matplotlib.pyplot as plt
 
