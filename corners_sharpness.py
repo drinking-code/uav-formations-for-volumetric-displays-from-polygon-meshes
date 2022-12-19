@@ -28,7 +28,7 @@ def calc_single_corner_sharpness(vertex, faces):
         angle_between_vectors_anchor(connected_vertex[0], connected_vertex[1], vertex)
         for connected_vertex in connected_vertices
     ]
-    angles_sum = reduce(lambda a, b: a + b, connected_vertices_angles)
+    angles_sum = np.sum(connected_vertices_angles)
     sharpness = np.interp(angles_sum, (0, 360), (1, 0)) \
         if angles_sum <= 360 \
         else np.interp(angles_sum, (360, 360 * 2), (0, 1))

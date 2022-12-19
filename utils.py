@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def return_value(value):
     return value
 
@@ -82,3 +85,10 @@ def force_get_item(dictionary, key):
     if key not in dictionary:
         dictionary[key] = None
     return dictionary[key]
+
+
+def triangle_surface_area(face):
+    v = np.subtract(face[1], face[0])
+    w = np.subtract(face[2], face[0])
+    area = 0.5 * np.linalg.norm(np.cross(v, w))
+    return area

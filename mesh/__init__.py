@@ -2,7 +2,7 @@ import random
 from pprint import pprint
 
 from double_sided_dict import DoubleSidedMap
-from mesh.dedupe_verts_in_faces import dedupe_verts_in_faces
+from mesh.dedupe import dedupe_verts_in_faces
 from unique_vertices import unique_edges as calc_unique_edges, unique_vertices as calc_unique_vertices
 from utils import return_value, recursive_list, recursive_tuple
 

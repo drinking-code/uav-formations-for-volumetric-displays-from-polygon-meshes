@@ -1,5 +1,6 @@
 from pprint import pprint
 
+import numpy as np
 from stl import mesh as np_stl
 import matplotlib.pyplot as plt
 
@@ -9,10 +10,9 @@ from edges_sharpness import calc_edge_sharpness
 from mesh import Mesh
 from pyplot_draw_mesh import draw_corner_sharpness, draw_edge_sharpness
 from uav_formation import UAVFormation
-from utils import get_faces_with_vertex_dict
+from utils import get_faces_with_vertex_dict, triangle_surface_area
 
 """
-4. Distribute points on hard corners (vertices)
 4. Distribute points on hard edges _while keeping distance to already generated points_
 5. Distribute points on faces including soft edges and corners (vertices) (bluse noise sampling) _while keeping
    distance to already generated points_
@@ -20,8 +20,9 @@ from utils import get_faces_with_vertex_dict
 7. (Optional) perform checks
 """
 
-MAX_SHARPNESS = .1
+SHARPNESS_THRESHOLD = .1
 MIN_DISTANCE = .1
+MAX_AMOUNT_UAV = 100
 
 """
 1. Load data / convert into standardised format
@@ -43,14 +44,24 @@ mesh.set_edge_data(calc_edge_sharpness(mesh), sharpness_key)
 """
 3. Reduce hard corners that are too close
 """
-collapse_vertices(mesh, MAX_SHARPNESS, MIN_DISTANCE)
+collapse_vertices(mesh, SHARPNESS_THRESHOLD, MIN_DISTANCE)
 
 """
 Create formation structure
 """
 formation = UAVFormation()
 
-sharp_vertices = mesh.find_vertex(lambda vertex: mesh.get_vertex_data('sharpness')[tuple(vertex)] > MAX_SHARPNESS, True)
+"""
+4.1 Distribute points on hard corners (vertices)
+"""
+sharp_vertices = mesh.find_vertex(
+    lambda vertex: mesh.get_vertex_data('sharpness')[tuple(vertex)] > SHARPNESS_THRESHOLD,
+    True
+)
+for vertex_id, vertex in sharp_vertices.items():
+    formation[vertex_id][UAVFormation.positions] = vertex
+mesh.surface_area = np.sum([triangle_surface_area(face) for face in mesh.faces])
+print(mesh.surface_area)
 
 # plot faces and vertices
 figure = plt.figure()
@@ -64,4 +75,4 @@ scale = 8
 axes.set_xlim3d(scale / -2, scale / 2)
 axes.set_ylim3d(scale / -2, scale / 2)
 axes.set_zlim3d(0, scale)
-plt.show()
+# plt.show()
