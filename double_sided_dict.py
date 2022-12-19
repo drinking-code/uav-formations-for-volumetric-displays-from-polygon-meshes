@@ -1,5 +1,7 @@
 from pprint import pprint
 
+from utils import find_in_iterable
+
 
 class DoubleSidedMap:
     def __init__(self, dictionary, make_hashable):
@@ -20,12 +22,11 @@ class DoubleSidedMap:
 
     def find_by_value(self, is_desired, find_all=False):
         found = {}
-        for value in self.key_value.values():
-            if not is_desired(value):
-                continue
+
+        def add_to_found(value):
             found[self[value]] = self[self[value]]
-            if not find_all:
-                return found
+
+        find_in_iterable(self.key_value.values(), is_desired, add_to_found, find_all)
         return found
 
     def __contains__(self, other):

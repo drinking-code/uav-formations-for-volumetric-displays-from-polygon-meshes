@@ -92,3 +92,12 @@ def triangle_surface_area(face):
     w = np.subtract(face[2], face[0])
     area = 0.5 * np.linalg.norm(np.cross(v, w))
     return area
+
+
+def find_in_iterable(iterable, is_desired, add_to_found, find_all=False):
+    for value in iterable:
+        if not is_desired(value):
+            continue
+        add_to_found(value)
+        if not find_all:
+            return

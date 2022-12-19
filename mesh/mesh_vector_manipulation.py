@@ -2,7 +2,8 @@ from pprint import pprint
 
 import numpy as np
 
-from mesh.dedupe import dedupe_verts_in_edges, dedupe_verts_in_faces, remove_faces_duplicated_vertex
+from mesh.dedupe import dedupe_verts_in_edges, dedupe_verts_in_faces, remove_faces_duplicated_vertex, \
+    remove_edges_duplicated_vertex
 from utils import replace_values_in_list, recursive_list, zip_common, recursive_tuple, list_contains
 
 
@@ -95,6 +96,7 @@ def replace_vertices(self, vertices, target):
     dedupe_verts_in_faces(self.vertices_map, self.faces)
     remove_faces_duplicated_vertex(self.faces)
     dedupe_verts_in_edges(self.vertices_map, self.edges)
+    remove_edges_duplicated_vertex(self.edges, self.edges_map)
 
     # set new interpolated data
     for key in vectors_interpolated:

@@ -10,17 +10,16 @@ from edges_sharpness import calc_edge_sharpness
 from mesh import Mesh
 from pyplot_draw_mesh import draw_corner_sharpness, draw_edge_sharpness
 from uav_formation import UAVFormation
-from utils import get_faces_with_vertex_dict, triangle_surface_area
+from utils import get_faces_with_vertex_dict, triangle_surface_area, recursive_tuple
 
 """
-4. Distribute points on hard edges _while keeping distance to already generated points_
 5. Distribute points on faces including soft edges and corners (vertices) (bluse noise sampling) _while keeping
    distance to already generated points_
 6. Map colors to points
 7. (Optional) perform checks
 """
 
-SHARPNESS_THRESHOLD = .1
+SHARPNESS_THRESHOLD = .2
 MIN_DISTANCE = .1
 MAX_AMOUNT_UAV = 100
 
@@ -61,18 +60,31 @@ sharp_vertices = mesh.find_vertex(
 for vertex_id, vertex in sharp_vertices.items():
     formation[vertex_id][UAVFormation.positions] = vertex
 mesh.surface_area = np.sum([triangle_surface_area(face) for face in mesh.faces])
-print(mesh.surface_area)
+
+"""
+4.2 Distribute points on hard edges _while keeping distance to already generated points_
+"""
+sharp_edges = mesh.find_edges(
+    lambda edge: mesh.get_edge_data('sharpness')[recursive_tuple(edge)] > SHARPNESS_THRESHOLD,
+    True
+)
+density_per_square_unit = MAX_AMOUNT_UAV / mesh.surface_area
+density_per_unit = np.sqrt(density_per_square_unit)
+# print(density_per_square_unit, density_per_unit, sharp_edges)
+
 
 # plot faces and vertices
 figure = plt.figure()
 axes = figure.add_subplot(projection='3d', computed_zorder=False)
 axes.set_proj_type('persp', focal_length=0.2)
 
-draw_corner_sharpness(mesh.get_vertex_data(sharpness_key), axes)
-draw_edge_sharpness(mesh.get_edge_data(sharpness_key), axes)
+# draw_corner_sharpness(mesh.get_vertex_data(sharpness_key), axes)
+draw_corner_sharpness({recursive_tuple(vertex): 0 for vertex in sharp_vertices.values()}, axes)
+# draw_edge_sharpness(mesh.get_edge_data(sharpness_key), axes)
+draw_edge_sharpness({recursive_tuple(edge): 0 for edge in sharp_edges.values()}, axes)
 
 scale = 8
 axes.set_xlim3d(scale / -2, scale / 2)
 axes.set_ylim3d(scale / -2, scale / 2)
 axes.set_zlim3d(0, scale)
-# plt.show()
+plt.show()
