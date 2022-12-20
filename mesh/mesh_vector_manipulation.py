@@ -3,7 +3,7 @@ from pprint import pprint
 import numpy as np
 
 from mesh.dedupe import dedupe_verts_in_edges, dedupe_verts_in_faces, remove_faces_duplicated_vertex, \
-    remove_edges_duplicated_vertex
+    remove_edges_duplicated_vertex, gracefully_dedupe_edges
 from utils import replace_values_in_list, recursive_list, zip_common, recursive_tuple, list_contains
 
 
@@ -21,7 +21,7 @@ def move_vertex(self, vertex, target):
     del self.vertices_map[vertex_key]
     # get edges with vertex and delete keys (baked tuples)
     edges_with_vertex = self.edges_map.find_by_value(edge_has_vertex, True)
-    for edge_key in edges_with_vertex.keys():
+    for edge_key in edges_with_vertex:
         del self.edges_map[edge_key]
 
     # change vertex values
@@ -78,7 +78,7 @@ def replace_vertices(self, vertices, target):
         existing_vector_filter = list(filter(lambda vertex: vertex in vertices, edge))
         if len(existing_vector_filter) != 1:
             continue
-        edge_vector_outside_vectors = list(filter(lambda vertex: vertex is not existing_vector_filter[0], edge))[0]
+        edge_vector_outside_vectors = list(filter(lambda vertex: vertex != existing_vector_filter[0], edge))[0]
         edge_vector_outside_vectors_tuple = tuple(edge_vector_outside_vectors)
         if edge_vector_outside_vectors_tuple not in edges_half_in_vector_group:
             edges_half_in_vector_group[edge_vector_outside_vectors_tuple] = []
@@ -97,6 +97,7 @@ def replace_vertices(self, vertices, target):
     remove_faces_duplicated_vertex(self.faces)
     dedupe_verts_in_edges(self.vertices_map, self.edges)
     remove_edges_duplicated_vertex(self.edges, self.edges_map)
+    gracefully_dedupe_edges(self.edges, self.edges_map)
 
     # set new interpolated data
     for key in vectors_interpolated:

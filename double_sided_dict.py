@@ -54,6 +54,19 @@ class DoubleSidedMap:
         del self.value_key[self.make_hashable(original_value)]
         del self.key_value[key_hashable]
 
+    def point_key_to(self, key, key_of_value):
+        """
+        Points key to other (existing) value and deletes current value.
+        Also points the old hashable value to the new key.
+        :param key:
+        :param key_of_value:
+        :return:
+        """
+        old_value_hashable = try_to_otherwise_return_value(self.make_hashable, self.key_value[key])
+        self.value_key[old_value_hashable] = key_of_value
+        self.key_value[key] = self.key_value[key_of_value]
+
+
     def __ior__(self, other):
         for key, value in other:
             self.value_key[self.make_hashable(value)] = key

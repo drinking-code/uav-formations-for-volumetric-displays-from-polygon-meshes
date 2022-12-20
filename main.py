@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 from collapse_vertices import collapse_vertices
 from corners_sharpness import calc_corner_sharpness
+from distribute_on_edges import distribute_on_edges
 from edges_sharpness import calc_edge_sharpness
 from mesh import Mesh
 from pyplot_draw_mesh import draw_corner_sharpness, draw_edge_sharpness
@@ -71,6 +72,7 @@ sharp_edges = mesh.find_edges(
 density_per_square_unit = MAX_AMOUNT_UAV / mesh.surface_area
 density_per_unit = np.sqrt(density_per_square_unit)
 # print(density_per_square_unit, density_per_unit, sharp_edges)
+distribute_on_edges(list(sharp_edges.values()), density_per_unit, sharp_vertices)
 
 
 # plot faces and vertices
@@ -79,7 +81,7 @@ axes = figure.add_subplot(projection='3d', computed_zorder=False)
 axes.set_proj_type('persp', focal_length=0.2)
 
 # draw_corner_sharpness(mesh.get_vertex_data(sharpness_key), axes)
-draw_corner_sharpness({recursive_tuple(vertex): 0 for vertex in sharp_vertices.values()}, axes)
+# draw_corner_sharpness({recursive_tuple(vertex): 0 for vertex in sharp_vertices.values()}, axes)
 # draw_edge_sharpness(mesh.get_edge_data(sharpness_key), axes)
 draw_edge_sharpness({recursive_tuple(edge): 0 for edge in sharp_edges.values()}, axes)
 
@@ -87,4 +89,4 @@ scale = 8
 axes.set_xlim3d(scale / -2, scale / 2)
 axes.set_ylim3d(scale / -2, scale / 2)
 axes.set_zlim3d(0, scale)
-plt.show()
+# plt.show()
