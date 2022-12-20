@@ -10,6 +10,8 @@ class DoubleSidedMap:
         self.value_key = {}
         for key, value in dictionary.items():
             self.value_key[make_hashable(value)] = key
+        self.key_value_pointers = {}
+        self.value_key_pointers = {}
 
     def __iter__(self):
         yield from self.key_value.items()
@@ -36,9 +38,13 @@ class DoubleSidedMap:
     def __getitem__(self, key):
         key_hashable = try_to_otherwise_return_value(self.make_hashable, key)
         if key_hashable in self.key_value:
-            return self.key_value[key_hashable]
+            return (self.key_value_pointers[key_hashable]
+                    if key_hashable in self.key_value_pointers
+                    else self.key_value[key_hashable])
         elif key_hashable in self.value_key:
-            return self.value_key[key_hashable]
+            return (self.value_key_pointers[key_hashable]
+                    if key_hashable in self.value_key_pointers
+                    else self.value_key[key_hashable])
         else:
             return None
 
@@ -63,9 +69,9 @@ class DoubleSidedMap:
         :return:
         """
         old_value_hashable = try_to_otherwise_return_value(self.make_hashable, self.key_value[key])
-        self.value_key[old_value_hashable] = key_of_value
-        self.key_value[key] = self.key_value[key_of_value]
-
+        del self[key]
+        self.value_key_pointers[old_value_hashable] = key_of_value
+        self.key_value_pointers[key] = self.key_value[key_of_value]
 
     def __ior__(self, other):
         for key, value in other:

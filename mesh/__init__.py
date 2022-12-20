@@ -40,14 +40,14 @@ class Mesh:
             self.edge_data[key].clear()
         if key not in self.edge_data:
             self.edge_data[key] = {}
-        self.edge_data[key] |= translate_dict(dictionary, self.edges_map.value_key)
+        self.edge_data[key] |= translate_dict(dictionary, self.edges_map)
 
     def get_edge_data(self, key):
         """
         :param key:
         :return: dict with edge (tuple of two tuple-vertices) as keys
         """
-        return translate_dict(self.edge_data[key], self.edges_map.key_value, recursive_tuple)
+        return translate_dict(self.edge_data[key], self.edges_map, recursive_tuple)
 
     def set_vertex_data(self, dictionary, key, merge=True):
         """
