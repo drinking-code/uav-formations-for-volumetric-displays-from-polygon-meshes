@@ -1,9 +1,10 @@
 from pprint import pprint
 
-from utils import list_contains
+from path_group import PathGroup
+from utils import list_contains, find_one_in_iterable, find_in_iterable
 
 
-def distribute_on_edges(edges, density, explicit_terminators=None):
+def distribute_on_edges(edges, density, min_distance, explicit_terminators=None):
     """
     Calculates points to represent the given edges. It partitions edges into groups which have a terminator placed at
     each end. These terminators are placed where a line does not connect to any other line or connects to more than one
@@ -11,15 +12,37 @@ def distribute_on_edges(edges, density, explicit_terminators=None):
     :param edges: Edges on which points should be distributed on.
     :param density: Points per unit that should be placed. An edge of length 3 with a density of 1 will have 3 points
     placed. The same edge with a density of 2 will have 6 points placed.
+    :param min_distance:
     :param explicit_terminators: Explicitly place a point here. The returned list will not include these points
     :return:
     """
     if explicit_terminators is None:
         explicit_terminators = []
     edges = edges.copy()
-    groups, definite_terminators = group_connected(edges, explicit_terminators)
+    groups, definite_terminators, non_terminators = group_connected(edges, explicit_terminators)
+    groups = [PathGroup(group) for group in groups]
 
-    return groups
+    for intersection in non_terminators:
+        pass  # todo
+    for terminator in definite_terminators:
+        path_groups: list[PathGroup] = []
+        # indicates if the edge with the terminator is in the first (False) or last (True) edge of the group
+        path_group_is_reversed = []
+        find_in_iterable(
+            groups,
+            lambda group: any([
+                starting_path_group := terminator == group.get_first_vertex(),
+                ending_path_group := terminator == group.get_last_vertex(),
+                path_group_is_reversed.append(ending_path_group)
+                if starting_path_group or ending_path_group else None
+            ]),
+            path_groups.append,
+            True
+        )
+        first_path_group = path_groups[0]
+        first_path_group.get_point_at_length(min_distance)
+        print(path_groups, path_group_is_reversed)
+        print(terminator)
 
 
 def group_connected(edges, explicit_terminators):
@@ -27,6 +50,7 @@ def group_connected(edges, explicit_terminators):
     edges = edges.copy()
 
     definite_terminators = []
+    non_terminators = []
 
     while edges:
         def trace(start_trace, direction=True):
@@ -36,6 +60,8 @@ def group_connected(edges, explicit_terminators):
             connecting_vertex = start_trace[target_vertex_index]
 
             if connecting_vertex in explicit_terminators or connecting_vertex in definite_terminators:
+                if connecting_vertex not in definite_terminators:
+                    definite_terminators.append(connecting_vertex)
                 return traced_edges
 
             for edge in edges:
@@ -58,6 +84,9 @@ def group_connected(edges, explicit_terminators):
             elif len(adjacent_edges) == 0:
                 if connecting_vertex not in definite_terminators:
                     definite_terminators.append(connecting_vertex)
+            else:  # if len(adjacent_edges) > 1:
+                if connecting_vertex not in definite_terminators and connecting_vertex not in explicit_terminators:
+                    non_terminators.append(connecting_vertex)
 
             return traced_edges
 
@@ -68,4 +97,4 @@ def group_connected(edges, explicit_terminators):
         group = edges_backward + [start_with] + edges_forward
         groups.append(group)
 
-    return groups, definite_terminators
+    return groups, definite_terminators, non_terminators
