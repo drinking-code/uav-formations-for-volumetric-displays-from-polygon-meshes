@@ -1,3 +1,4 @@
+import random
 from pprint import pprint
 
 import numpy as np
@@ -72,7 +73,9 @@ sharp_edges = mesh.find_edges(
 density_per_square_unit = MAX_AMOUNT_UAV / mesh.surface_area
 density_per_unit = np.sqrt(density_per_square_unit)
 # print(density_per_square_unit, density_per_unit, sharp_edges)
-groups = distribute_on_edges(list(sharp_edges.values()), density_per_unit, MIN_DISTANCE, list(sharp_vertices.values()))
+wire_vertices = distribute_on_edges(list(sharp_edges.values()), density_per_unit, MIN_DISTANCE, list(sharp_vertices.values()))
+for vertex in wire_vertices:
+    formation[random.randint(0, 2 ** 32)][UAVFormation.positions] = vertex
 
 # plot faces and vertices
 figure = plt.figure()
@@ -81,11 +84,12 @@ axes.set_proj_type('persp', focal_length=0.2)
 
 # draw_corner_sharpness(mesh.get_vertex_data(sharpness_key), axes)
 # draw_corner_sharpness({recursive_tuple(vertex): 0 for vertex in sharp_vertices.values()}, axes)
+draw_corner_sharpness({recursive_tuple(vertex): 0 for vertex in formation[UAVFormation.positions].values()}, axes)
 # draw_edge_sharpness(mesh.get_edge_data(sharpness_key), axes)
-# draw_edge_sharpness({recursive_tuple(edge): 0 for edge in sharp_edges.values()}, axes)
+draw_edge_sharpness({recursive_tuple(edge): 0 for edge in sharp_edges.values()}, axes)
 
 scale = 8
 axes.set_xlim3d(scale / -2, scale / 2)
 axes.set_ylim3d(scale / -2, scale / 2)
 axes.set_zlim3d(0, scale)
-# plt.show()
+plt.show()

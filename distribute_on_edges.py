@@ -22,6 +22,9 @@ def distribute_on_edges(edges, density, min_distance, explicit_terminators=None)
     groups, definite_terminators, non_terminators = group_connected(edges, explicit_terminators)
     groups = [PathGroup(group) for group in groups]
 
+    target_distance = max(min_distance, 1 / density)
+    vertices = []
+
     for intersection in non_terminators:
         pass  # todo
     for terminator in definite_terminators:
@@ -40,9 +43,15 @@ def distribute_on_edges(edges, density, min_distance, explicit_terminators=None)
             True
         )
         first_path_group = path_groups[0]
-        first_path_group.get_point_at_length(min_distance)
-        print(path_groups, path_group_is_reversed)
-        print(terminator)
+        vertex_at_min_dist_from_terminator = first_path_group.get_point_at_length(
+            target_distance
+            if not path_group_is_reversed[0] else
+            first_path_group.total_length - target_distance
+        )
+        vertices.append(vertex_at_min_dist_from_terminator)
+        # print(path_groups, path_group_is_reversed)
+        # print(terminator)
+    return vertices
 
 
 def group_connected(edges, explicit_terminators):

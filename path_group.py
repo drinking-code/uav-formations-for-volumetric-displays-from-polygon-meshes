@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import list_contains, find_one_in_iterable
+from utils import list_contains, find_one_in_iterable, interpolate_vertices
 
 
 class PathGroup:
@@ -32,7 +32,21 @@ class PathGroup:
         pass
 
     def get_point_at_length(self, length):
-        pass
+        length_copy = length
+        path_index = 0
+        for path_length in self.lengths:
+            if length_copy < path_length:
+                break
+            length_copy -= path_length
+            path_index += 1
+        path = self.paths[path_index]
+        is_reversed = (not list_contains(self.paths[path_index + 1], path[1])) \
+            if path_index + 1 < len(self.paths) \
+            else (not list_contains(self.paths[path_index - 1], path[0]))
+        first_vertex = path[0] if not is_reversed else path[1]
+        last_vertex = path[1] if not is_reversed else path[0]
+        vertex = interpolate_vertices(first_vertex, last_vertex, length_copy / self.lengths[path_index])
+        return list(vertex)
 
     def __str__(self):
         return 'PathGroup ' + self.paths.__str__()

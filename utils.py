@@ -132,3 +132,7 @@ def sphere_line_intersection(sphere_center, radius, line):
     points_of_intersection.append(list(d))
 
     return tuple(points_of_intersection)
+
+
+def interpolate_vertices(a, b, x):
+    return np.average([a, b], axis=0, weights=[1 - x, x])
