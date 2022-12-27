@@ -55,9 +55,9 @@ def distribute_on_edges(edges, density, min_distance, explicit_terminators=None)
         vertex_at_min_dist_from_terminator = point_from_terminator(path_groups[0], last_vertex_is_terminator[0])
         vertices.append(vertex_at_min_dist_from_terminator)
 
-        for next_path_group in path_groups[1:]:
+        for next_path_group, last_vertex_is_terminator in zip(path_groups[1:], last_vertex_is_terminator[1:]):
             next_path_group_touching_edge = next_path_group.paths[len(next_path_group.paths) - 1] \
-                if last_vertex_is_terminator[1] else next_path_group.paths[0]
+                if last_vertex_is_terminator else next_path_group.paths[0]
 
             possible_vertices = sphere_line_intersection(
                 vertex_at_min_dist_from_terminator,
@@ -66,7 +66,9 @@ def distribute_on_edges(edges, density, min_distance, explicit_terminators=None)
             )
 
             if not possible_vertices:
-                continue  # todo: set vertex at normal distance
+                vertex = point_from_terminator(next_path_group, last_vertex_is_terminator)
+                vertices.append(vertex)
+                continue
 
             if type(possible_vertices) is not tuple:
                 possible_vertices = tuple([possible_vertices])
@@ -92,10 +94,9 @@ def distribute_on_edges(edges, density, min_distance, explicit_terminators=None)
                 # means either:
                 # - the point(s) on path of minimum distance to the point on first path is too close to terminator
                 # - the points are not actually on the line segment
-                # todo: set vertex at normal distance
-                pass
+                vertex = point_from_terminator(next_path_group, last_vertex_is_terminator)
+                vertices.append(vertex)
             else:
-                print(possible_vertices)
                 for vertex in possible_vertices:
                     vertices.append(vertex)
 

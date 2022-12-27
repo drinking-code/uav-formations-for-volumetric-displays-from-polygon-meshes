@@ -80,8 +80,8 @@ for vertex in wire_vertices:
 # plot faces and vertices
 figure = plt.figure()
 axes = figure.add_subplot(projection='3d', computed_zorder=False)
-# axes.set_proj_type('persp', focal_length=0.2)
-axes.set_proj_type('ortho')
+axes.set_proj_type('persp', focal_length=0.2)
+# axes.set_proj_type('ortho')
 
 # draw_corner_sharpness(mesh.get_vertex_data(sharpness_key), axes)
 # draw_corner_sharpness({recursive_tuple(vertex): 0 for vertex in sharp_vertices.values()}, axes)
