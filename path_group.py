@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import list_contains, find_one_in_iterable, interpolate_vertices
+from utils import list_contains, find_one_in_iterable, interpolate_vertices, point_line_segment_distance
 
 
 class PathGroup:
@@ -47,6 +47,10 @@ class PathGroup:
         last_vertex = path[1] if not is_reversed else path[0]
         vertex = interpolate_vertices(first_vertex, last_vertex, length_copy / self.lengths[path_index])
         return list(vertex)
+
+    def is_on_path(self, point, error=1e-06):
+        distance = np.amin([point_line_segment_distance(point, line_seg) for line_seg in self.paths])
+        return distance <= error
 
     def __str__(self):
         return 'PathGroup ' + self.paths.__str__()

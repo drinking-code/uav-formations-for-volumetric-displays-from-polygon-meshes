@@ -1,7 +1,9 @@
 from pprint import pprint
 
+import numpy as np
+
 from path_group import PathGroup
-from utils import list_contains, find_one_in_iterable, find_in_iterable
+from utils import list_contains, find_in_iterable, sphere_line_intersection
 
 
 def distribute_on_edges(edges, density, min_distance, explicit_terminators=None):
@@ -30,26 +32,74 @@ def distribute_on_edges(edges, density, min_distance, explicit_terminators=None)
     for terminator in definite_terminators:
         path_groups: list[PathGroup] = []
         # indicates if the edge with the terminator is in the first (False) or last (True) edge of the group
-        path_group_is_reversed = []
+        last_vertex_is_terminator = []
         find_in_iterable(
             groups,
             lambda group: any([
                 starting_path_group := terminator == group.get_first_vertex(),
                 ending_path_group := terminator == group.get_last_vertex(),
-                path_group_is_reversed.append(ending_path_group)
+                last_vertex_is_terminator.append(ending_path_group)
                 if starting_path_group or ending_path_group else None
             ]),
             path_groups.append,
             True
         )
-        first_path_group = path_groups[0]
-        vertex_at_min_dist_from_terminator = first_path_group.get_point_at_length(
-            target_distance
-            if not path_group_is_reversed[0] else
-            first_path_group.total_length - target_distance
-        )
+
+        def point_from_terminator(path_group, reverse):
+            return path_group.get_point_at_length(
+                target_distance
+                if not reverse else
+                path_group.total_length - target_distance
+            )
+
+        vertex_at_min_dist_from_terminator = point_from_terminator(path_groups[0], last_vertex_is_terminator[0])
         vertices.append(vertex_at_min_dist_from_terminator)
-        # print(path_groups, path_group_is_reversed)
+
+        for next_path_group in path_groups[1:]:
+            next_path_group_touching_edge = next_path_group.paths[len(next_path_group.paths) - 1] \
+                if last_vertex_is_terminator[1] else next_path_group.paths[0]
+
+            possible_vertices = sphere_line_intersection(
+                vertex_at_min_dist_from_terminator,
+                target_distance,
+                next_path_group_touching_edge
+            )
+
+            if not possible_vertices:
+                continue  # todo: set vertex at normal distance
+
+            if type(possible_vertices) is not tuple:
+                possible_vertices = tuple([possible_vertices])
+
+            possible_vertices = list(filter(next_path_group.is_on_path, possible_vertices))
+            possible_vertices_distance_from_terminator = list(map(
+                lambda vertex: (vertex, np.linalg.norm(np.subtract(terminator, vertex))),
+                possible_vertices
+            ))
+            possible_vertices_distance_from_terminator = list(filter(
+                lambda data: (distance := data[1], distance >= target_distance)[1],
+                possible_vertices_distance_from_terminator
+            ))
+            possible_vertices_distance_from_terminator = list(sorted(
+                possible_vertices_distance_from_terminator,
+                key=lambda data: (distance := data[1], distance)[1]
+            ))
+            possible_vertices = list(map(
+                lambda data: (vertex := data[0], vertex)[1],
+                possible_vertices_distance_from_terminator
+            ))
+            if not possible_vertices:
+                # means either:
+                # - the point(s) on path of minimum distance to the point on first path is too close to terminator
+                # - the points are not actually on the line segment
+                # todo: set vertex at normal distance
+                pass
+            else:
+                print(possible_vertices)
+                for vertex in possible_vertices:
+                    vertices.append(vertex)
+
+        # print(path_groups, last_vertex_is_terminator)
         # print(terminator)
     return vertices
 

@@ -120,19 +120,29 @@ def sphere_line_intersection(sphere_center, radius, line):
     expr_under_sqrt = b ** 2 - 4 * a * c
     if expr_under_sqrt < 0:
         return None
-    t = (-b + expr_under_sqrt) / (2 * a)
-    points_of_intersection = []
-    d = np.add(line[0], np.multiply(t, np.subtract(line[1], line[0])))
-    points_of_intersection.append(list(d))
-    if expr_under_sqrt == 0:
-        return points_of_intersection[0]
 
-    t = (-b - expr_under_sqrt) / (2 * a)
-    d = np.add(line[0], np.multiply(t, np.subtract(line[1], line[0])))
-    points_of_intersection.append(list(d))
+    points_of_intersection = []
+
+    for sign in ([+1] if expr_under_sqrt == 0 else [+1, -1]):
+        t = (-b + np.sqrt(expr_under_sqrt) * sign) / (2 * a)
+        d = np.add(line[0], np.multiply(t, np.subtract(line[1], line[0])))
+        points_of_intersection.append(list(d))
 
     return tuple(points_of_intersection)
 
 
 def interpolate_vertices(a, b, x):
     return np.average([a, b], axis=0, weights=[1 - x, x])
+
+
+def point_line_segment_distance(point, line):
+    tangent = np.subtract(line[1], line[0])
+    norm_tangent = np.divide(tangent, np.linalg.norm(tangent))
+
+    a_parallel_distance = np.dot(np.subtract(line[0], point), norm_tangent)
+    b_parallel_distance = np.dot(np.subtract(point, line[1]), norm_tangent)
+
+    parallel_distance_clamped = np.maximum.reduce([a_parallel_distance, b_parallel_distance, 0])
+    perpendicular_distance = np.cross(np.subtract(point, line[0]), norm_tangent)
+
+    return np.hypot(parallel_distance_clamped, np.linalg.norm(perpendicular_distance))
