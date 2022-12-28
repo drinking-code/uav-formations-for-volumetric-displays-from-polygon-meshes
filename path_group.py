@@ -13,10 +13,28 @@ class PathGroup:
         paths_vectors = [np.subtract(path[0], path[1]) for path in self.paths]
         self.lengths = [np.linalg.norm(vector) for vector in paths_vectors]
         self.total_length = np.sum(self.lengths)
+        self.points_amount = None
+        self.density = None
+        self.target_distance = None
         self.percentages = []
         for index, length in enumerate(self.lengths):
             last_percentage = self.percentages[index - 1] if index > 0 else 0
             self.percentages.append(min(1.0, (length / self.total_length) + last_percentage))
+
+        self.points_start = None
+        self.points_end = None
+
+    def set_density(self, density, min_distance):
+        self.density = 1 / self.set_target_distance(1 / density, min_distance)
+        return self.density
+
+    def set_target_distance(self, target_distance, min_distance):
+        self.points_amount = int(np.round(self.total_length / target_distance))
+        self.target_distance = self.total_length / self.points_amount
+        while self.target_distance < min_distance:
+            self.points_amount -= 1
+            self.target_distance = self.total_length / self.points_amount
+        return target_distance
 
     def get_first_vertex(self):
         first_path = self.paths[0]
