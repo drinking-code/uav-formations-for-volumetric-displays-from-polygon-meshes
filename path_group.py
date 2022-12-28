@@ -47,7 +47,7 @@ class PathGroup:
         return find_one_in_iterable(last_path, lambda vertex: not list_contains(second_last_path, vertex))
 
     def get_point_at_percent(self, percentage):
-        pass
+        return self.get_point_at_length(self.total_length * percentage)
 
     def get_point_at_length(self, length):
         length_copy = length
