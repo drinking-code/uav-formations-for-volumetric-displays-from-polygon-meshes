@@ -31,7 +31,6 @@ def distribute_on_edges(edges, density, min_distance, explicit_terminators=None)
     for path_group in groups:
         percentage_steps = list(np.arange(0, 1, 1 / path_group.points_amount))
         del percentage_steps[0]
-        print(percentage_steps)
         if path_group.points_start:
             del percentage_steps[0]
         if path_group.points_end:
@@ -41,5 +40,4 @@ def distribute_on_edges(edges, density, min_distance, explicit_terminators=None)
             vertex = path_group.get_point_at_percent(percentage)
             vertices.append(vertex)
 
-    print(len(vertices))
     return vertices
