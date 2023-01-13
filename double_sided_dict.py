@@ -37,16 +37,32 @@ class DoubleSidedMap:
 
     def __getitem__(self, key):
         key_hashable = try_to_otherwise_return_value(self.make_hashable, key)
-        if key_hashable in self.key_value:
+        if key_hashable in self.key_value or key_hashable in self.key_value_pointers:
             return (self.key_value_pointers[key_hashable]
                     if key_hashable in self.key_value_pointers
                     else self.key_value[key_hashable])
-        elif key_hashable in self.value_key:
+        elif key_hashable in self.value_key or key_hashable in self.value_key_pointers:
             return (self.value_key_pointers[key_hashable]
                     if key_hashable in self.value_key_pointers
                     else self.value_key[key_hashable])
         else:
             return None
+
+    def get_all(self, key):
+        results = []
+        key_hashable = try_to_otherwise_return_value(self.make_hashable, key)
+        all_maps = {}
+        all_maps.update(self.key_value)
+        all_maps.update(self.key_value_pointers)
+        all_maps.update(self.value_key)
+        all_maps.update(self.value_key_pointers)
+        for key, value in all_maps.items():
+            if key == key_hashable:
+                results.append(value)
+            if try_to_otherwise_return_value(self.make_hashable, value) == key_hashable:
+                results.append(key)
+
+        return tuple(list(dict.fromkeys(results)))
 
     def __setitem__(self, key, value):
         if key in self.key_value:
@@ -56,9 +72,16 @@ class DoubleSidedMap:
 
     def __delitem__(self, key):
         key_hashable = try_to_otherwise_return_value(self.make_hashable, key)
-        original_value = self.key_value[key_hashable]
-        del self.value_key[self.make_hashable(original_value)]
-        del self.key_value[key_hashable]
+        try:
+            original_value = self.key_value[key_hashable]
+            del self.value_key[self.make_hashable(original_value)]
+        except KeyError:
+            pass
+
+        try:
+            del self.key_value[key_hashable]
+        except KeyError:
+            pass
 
     def point_key_to(self, key, key_of_value):
         """

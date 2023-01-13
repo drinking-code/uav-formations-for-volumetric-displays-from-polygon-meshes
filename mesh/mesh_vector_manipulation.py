@@ -72,9 +72,12 @@ def replace_vertices(self, vertices, target):
 
     # find edges that contain one of the given vectors -> interpolate values
     edges_half_in_vector_group = {}
+    # print(self.edges_map.value_key)
     for edge_id, edge in self.edges_map:
+        # print('a', edge_id, edge)
         edge = list(edge)
         edge = self.edges_map[self.edges_map[edge]]
+        # print('b', self.edges_map[edge], edge)
         existing_vector_filter = list(filter(lambda vertex: vertex in vertices, edge))
         if len(existing_vector_filter) != 1:
             continue

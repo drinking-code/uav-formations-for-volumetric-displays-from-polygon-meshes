@@ -1,3 +1,6 @@
+from pprint import pprint
+
+from double_sided_dict import DoubleSidedMap
 from utils import list_contains
 
 
@@ -48,14 +51,15 @@ def remove_faces_duplicated_vertex(faces):
     delete_if(faces, face_should_be_deleted)
 
 
-def remove_edges_duplicated_vertex(edges, edges_map):
+def remove_edges_duplicated_vertex(edges, edges_map: DoubleSidedMap):
     """
     Remove edges that have one vertex twice instead of two unique vertices
     :return:
     """
 
     def delete(key):
-        del edges_map[edges_map[edges[key]]]
+        for edge_key in edges_map.get_all(edges[key]):
+            del edges_map[edge_key]
         del edges[key]
 
     delete_if(edges, lambda edge: edge[0] == edge[1], delete)
@@ -86,7 +90,10 @@ def gracefully_dedupe_edges(edges, edges_map):
         return was_seen
 
     def delete(key):
-        edges_map.point_key_to(edges_map[edges[key]], should_be_deleted_keys[key])
+        key_from = edges_map[edges[key]]
+        key_to = should_be_deleted_keys[key]
+        if key_from != key_to:
+            edges_map.point_key_to(edges_map[edges[key]], should_be_deleted_keys[key])
         del edges[key]
 
     delete_if(edges, should_be_deleted, delete)
