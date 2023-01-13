@@ -87,7 +87,7 @@ for vertex in wire_vertices:
    distance to already generated points_
 """
 # slice mesh along sharp edges
-slices = slice_mesh(mesh, sharp_edges)
+slices = slice_mesh(mesh, list(sharp_edges.values()))
 # slices_vectors = [unique_vertices(mesh_slice) for mesh_slice in slices.values()]
 
 # plot faces and vertices
@@ -98,8 +98,8 @@ axes.set_proj_type('persp', focal_length=0.2)
 
 colors = ['#FF8686', '#FFD886', '#D6FF86', '#88FF86', '#86FFD7', '#86D7FF', '#8886FF', '#D686FF', '#FF86D8', '#000']
 for index, mesh_slice in enumerate(slices.values()):
-    # print(mesh_slice, axes, colors[index])
-    draw_mesh_faces(mesh_slice, axes, facecolors=colors[index], opacity=.5)
+    print(mesh_slice)
+    draw_mesh_faces(mesh_slice, axes, facecolors=colors[index])
 # draw_corner_sharpness(mesh.get_vertex_data(sharpness_key), axes)
 # draw_corner_sharpness({recursive_tuple(vertex): 0 for vertex in sharp_vertices.values()}, axes)
 # draw_corner_sharpness({recursive_tuple(vertex): 0 for vertex in formation[UAVFormation.positions].values()}, axes)

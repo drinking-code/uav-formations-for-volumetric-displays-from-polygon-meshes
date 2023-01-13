@@ -12,7 +12,7 @@ colors = getattr(cm, color_scale_name)(np.linspace(1, 0, color_depth))
 
 
 def draw_mesh_faces(vectors, axes, facecolors='w', opacity=1):
-    mesh = art3d.Poly3DCollection(vectors, facecolors=facecolors, alpha=1-opacity)
+    mesh = art3d.Poly3DCollection(vectors, facecolors=facecolors, alpha=opacity)
     axes.add_collection3d(mesh)
 
 
