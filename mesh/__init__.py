@@ -13,7 +13,7 @@ class Mesh:
         self.normals = recursive_list(data.normals)
 
         self.vertices = calc_unique_vertices(self.faces)
-        self.vertices_map = DoubleSidedMap(
+        self.vertices_map: DoubleSidedMap = DoubleSidedMap(
             {random.randint(0, 2 ** 32): edge for edge in self.vertices},
             tuple
         )
@@ -21,7 +21,7 @@ class Mesh:
         dedupe_verts_in_faces(self.vertices_map, self.faces)
 
         self.edges = calc_unique_edges(self.faces)
-        self.edges_map = DoubleSidedMap(
+        self.edges_map: DoubleSidedMap = DoubleSidedMap(
             {random.randint(0, 2 ** 32): edge for edge in self.edges},
             recursive_tuple
         )

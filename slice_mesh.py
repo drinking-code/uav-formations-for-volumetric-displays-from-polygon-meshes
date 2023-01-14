@@ -1,9 +1,10 @@
 import random
+from pprint import pprint
 
 from utils import list_contains
 
 
-def get_edges_of_face(face, edges_map):
+def get_edges_of_face(face, edges_map):  # todo: fix: returns None sometimes
     edges_in_face = []
     for index, vertex_a in enumerate(face):
         for vertex_b in face[index + 1:]:
@@ -57,4 +58,5 @@ def slice_mesh(mesh, seams):
         # add edge refs
         for edge_id in edges_not_seams:
             edges_index_of_slice[edge_id] = slice_index
+
     return slices

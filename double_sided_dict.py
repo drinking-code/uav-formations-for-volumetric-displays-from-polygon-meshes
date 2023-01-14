@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from pprint import pprint
 
 from utils import find_in_iterable
@@ -37,6 +38,8 @@ class DoubleSidedMap:
 
     def __getitem__(self, key):
         key_hashable = try_to_otherwise_return_value(self.make_hashable, key)
+        key_hashable_rev = try_to_otherwise_return_value(self.make_hashable, [key[1], key[0]]) \
+                           if isinstance(key, Iterable) else False
         if key_hashable in self.key_value or key_hashable in self.key_value_pointers:
             return (self.key_value_pointers[key_hashable]
                     if key_hashable in self.key_value_pointers
@@ -45,6 +48,11 @@ class DoubleSidedMap:
             return (self.value_key_pointers[key_hashable]
                     if key_hashable in self.value_key_pointers
                     else self.value_key[key_hashable])
+        # todo: this is just awful
+        elif key_hashable_rev in self.value_key or key_hashable_rev in self.value_key_pointers:
+            return (self.value_key_pointers[key_hashable_rev]
+                    if key_hashable_rev in self.value_key_pointers
+                    else self.value_key[key_hashable_rev])
         else:
             return None
 
