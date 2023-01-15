@@ -30,13 +30,12 @@ def draw_edge_sharpness(sharpness_edges, axes):
 
 def draw_corner_sharpness(sharpness_corners, axes):
     i = 1
-    for vertex, vertex_sharpness in sharpness_corners.items():
-        vertex = list(vertex)
-        # if vertex_sharpness < .8:
-        #     continue
-        color_index = int(np.floor(np.interp(vertex_sharpness, (0, 1), (color_depth - 1, 0))))
-        axes.scatter(vertex[0], vertex[1], vertex[2], color=colors[color_index], zorder=20 + i)
-        i = i + 1
+    color_list = [
+        colors[int(np.floor(np.interp(vertex_sharpness, (0, 1), (color_depth - 1, 0))))]
+        for vertex_sharpness in sharpness_corners.values()
+    ]
+    vertices = np.array(list(sharpness_corners.keys()))
+    axes.scatter(vertices[:, 0], vertices[:, 1], vertices[:, 2], c=color_list, zorder=20 + i)
 
 
 def center_of_triangle(face):

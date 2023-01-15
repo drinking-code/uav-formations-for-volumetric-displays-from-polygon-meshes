@@ -1,4 +1,5 @@
 import random
+from functools import reduce
 from pprint import pprint
 
 import numpy as np
@@ -12,6 +13,7 @@ from edges_sharpness import calc_edge_sharpness
 from mesh import Mesh
 from pyplot_draw_mesh import draw_corner_sharpness, draw_edge_sharpness, draw_mesh_faces
 from slice_mesh import slice_mesh
+from surface_sampling import surface_sampling
 from uav_formation import UAVFormation
 from unique_vertices import unique_vertices
 from utils import triangle_surface_area, recursive_tuple
@@ -23,7 +25,7 @@ from utils import triangle_surface_area, recursive_tuple
 
 SHARPNESS_THRESHOLD = .2
 MIN_DISTANCE = .1
-MAX_AMOUNT_UAV = 100
+MAX_AMOUNT_UAV = 300
 
 """
 1. Load data / convert into standardised format
@@ -88,7 +90,22 @@ for vertex in wire_vertices:
 """
 # slice mesh along sharp edges
 slices = slice_mesh(mesh, list(sharp_edges.values()))
-# slices_vectors = [unique_vertices(mesh_slice) for mesh_slice in slices.values()]
+slices_vectors = [unique_vertices(mesh_slice) for mesh_slice in slices.values()]
+# print(slices)
+points_on_slices = [surface_sampling(mesh_slice, density_per_square_unit) for mesh_slice in slices.values()]
+points_on_slices_flat = reduce(lambda a, b: list(a) + list(b), points_on_slices)
+print(len(points_on_slices_flat))
+
+for vertex in points_on_slices_flat:
+    formation[random.randint(0, 2 ** 32)][UAVFormation.positions] = vertex
+
+"""
+Print stats and show results
+"""
+total_uav_amount = len(formation)
+print(f'UAVs used / UAVs available: {total_uav_amount} / {MAX_AMOUNT_UAV}')
+actual_density = total_uav_amount / mesh.surface_area
+print(f'Actual density / Aimed density: {np.around(actual_density, 3)} / {np.around(density_per_square_unit, 3)}')
 
 # plot faces and vertices
 figure = plt.figure()
@@ -98,13 +115,9 @@ axes.set_proj_type('persp', focal_length=0.2)
 
 colors = ['#FF8686', '#FFD886', '#D6FF86', '#88FF86', '#86FFD7', '#86D7FF', '#8886FF', '#D686FF', '#FF86D8', '#000']
 for index, mesh_slice in enumerate(slices.values()):
-    print(mesh_slice)
     draw_mesh_faces(mesh_slice, axes, facecolors=colors[index], opacity=.5)
-# draw_corner_sharpness(mesh.get_vertex_data(sharpness_key), axes)
-# draw_corner_sharpness({recursive_tuple(vertex): 0 for vertex in sharp_vertices.values()}, axes)
-# draw_corner_sharpness({recursive_tuple(vertex): 0 for vertex in formation[UAVFormation.positions].values()}, axes)
-# draw_edge_sharpness(mesh.get_edge_data(sharpness_key), axes)
-# draw_edge_sharpness({recursive_tuple(edge): 0 for edge in sharp_edges.values()}, axes)
+draw_corner_sharpness({recursive_tuple(vertex): 0 for vertex in formation[UAVFormation.positions].values()}, axes)
+draw_edge_sharpness({recursive_tuple(edge): 0 for edge in sharp_edges.values()}, axes)
 
 scale = 8
 axes.set_xlim3d(scale / -2, scale / 2)

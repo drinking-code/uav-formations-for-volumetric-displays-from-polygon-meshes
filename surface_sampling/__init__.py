@@ -4,8 +4,6 @@ import numpy
 from scipy.spatial.distance import pdist, squareform
 from scipy.spatial import KDTree
 
-import matplotlib.pyplot as plot
-
 
 def mesh_area(triangle_list):
     N = numpy.cross(triangle_list[:, 1] - triangle_list[:, 0], triangle_list[:, 2] - triangle_list[:, 0], axis=1)
@@ -77,9 +75,12 @@ def blue_noise_sample_elimination(point_list, mesh_surface_area, sample_count):
     return point_list[sorted(id_set)]
 
 
-def surface_sampling(triangle_list, sample_count):
+def surface_sampling(triangle_list, density):
+    triangle_list = numpy.array(triangle_list)
+
     # Compute surface area of each triangle
     tri_area = mesh_area(triangle_list)
+    sample_count = round(density * numpy.sum(tri_area))
 
     # Compute a uniform sampling of the input mesh
     point_list = uniform_sample_mesh(triangle_list, tri_area, 4 * sample_count)

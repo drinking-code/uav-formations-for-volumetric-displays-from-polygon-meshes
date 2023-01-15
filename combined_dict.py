@@ -42,6 +42,9 @@ class CombinedDict:
         string = "CombinedDicts [\n" + "\n".join(categories) + "\n]"
         return string
 
+    def __len__(self):
+        return self.data[self.categories[0]].values().__len__()
+
 
 class TempSubDict(dict):
     def __init__(self, dictionary, setitem_callback):
