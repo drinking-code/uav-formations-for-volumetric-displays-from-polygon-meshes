@@ -32,8 +32,9 @@ MAX_AMOUNT_UAV = 300
 """
 # mesh = mesh.Mesh.from_file('sword.stl')
 # mesh = np_stl.Mesh.from_file('sword_double_tip.stl')
-mesh = np_stl.Mesh.from_file('sword_double_tip_ascii.stl')
+# mesh = np_stl.Mesh.from_file('sword_double_tip_ascii.stl')
 # mesh = np_stl.Mesh.from_file('monkey.stl')
+mesh = np_stl.Mesh.from_file('cube.stl')
 mesh = Mesh(mesh)
 
 """
@@ -119,8 +120,9 @@ for index, mesh_slice in enumerate(slices.values()):
 draw_corner_sharpness({recursive_tuple(vertex): 0 for vertex in formation[UAVFormation.positions].values()}, axes)
 draw_edge_sharpness({recursive_tuple(edge): 0 for edge in sharp_edges.values()}, axes)
 
-scale = 8
+scale = 2.5
 axes.set_xlim3d(scale / -2, scale / 2)
 axes.set_ylim3d(scale / -2, scale / 2)
 axes.set_zlim3d(0, scale)
+axes.set_aspect('equal')
 plt.show()

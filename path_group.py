@@ -37,14 +37,20 @@ class PathGroup:
         return target_distance
 
     def get_first_vertex(self):
-        first_path = self.paths[0]
-        second_path = self.paths[1]
-        return find_one_in_iterable(first_path, lambda vertex: not list_contains(second_path, vertex))
+        if len(self.paths) == 1:
+            return self.paths[0][0]
+        else:
+            first_path = self.paths[0]
+            second_path = self.paths[1]
+            return find_one_in_iterable(first_path, lambda vertex: not list_contains(second_path, vertex))
 
     def get_last_vertex(self):
-        last_path = self.paths[len(self.paths) - 1]
-        second_last_path = self.paths[len(self.paths) - 2]
-        return find_one_in_iterable(last_path, lambda vertex: not list_contains(second_last_path, vertex))
+        if len(self.paths) == 1:
+            return self.paths[0][1]
+        else:
+            last_path = self.paths[len(self.paths) - 1]
+            second_last_path = self.paths[len(self.paths) - 2]
+            return find_one_in_iterable(last_path, lambda vertex: not list_contains(second_last_path, vertex))
 
     def get_point_at_percent(self, percentage):
         return self.get_point_at_length(self.total_length * percentage)
