@@ -29,11 +29,13 @@ def distribute_on_edges(edges, density, min_distance, explicit_terminators=None)
     vertices = safe_placement_on_corners(definite_terminators, non_terminators, groups, target_distance, min_distance)
 
     for path_group in groups:
+        if not path_group.points_amount:
+            continue
         percentage_steps = list(np.arange(0, 1, 1 / path_group.points_amount))
         del percentage_steps[0]
-        if path_group.points_start:
+        if path_group.points_start and percentage_steps:
             del percentage_steps[0]
-        if path_group.points_end:
+        if path_group.points_end and percentage_steps:
             del percentage_steps[len(percentage_steps) - 1]
 
         for percentage in percentage_steps:

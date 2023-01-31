@@ -17,7 +17,6 @@ reflection = numpy.array([[0., -1.], [-1., 0.]])
 
 
 def triangle_point_picking(triangle_list):
-    # print(triangle_point_picking)
     # Compute uniform distribution over [0, 1]x[0, 1] lower triangle
     X = numpy.random.random((triangle_list.shape[0], 2))
     t = numpy.sum(X, axis=1) > 1
@@ -39,15 +38,10 @@ def uniform_sample_mesh(triangle_list, triangle_area_list, sample_count, is_on_a
       * pick a point on that triangle with uniform probability
     '''
 
-    # triangle_id_list = numpy.random.choice(triangle_list.shape[0], size=sample_count, p=triangle_area)
     '''
     "triangle_list[triangle_id_list]" is a list of length "sample_count"
     where each value is a randomly (weighted with "triangle_area") selected face from "triangle_list"
     '''
-    # new_points = triangle_point_picking(triangle_list[triangle_id_list])
-    # print(triangle_id_list, new_points)
-    # return new_points
-    # print(triangle_list.shape[0])
     points = numpy.full((sample_count, 3), False)
     are_on_allowed_surface = numpy.full(sample_count, False)
     while not all(are_on_allowed_surface):
@@ -57,10 +51,8 @@ def uniform_sample_mesh(triangle_list, triangle_area_list, sample_count, is_on_a
         if regenerate_amount == 0:
             break
 
-        # print(triangle_area)
         triangle_id_list = numpy.random.choice(triangle_list.shape[0], size=regenerate_amount, p=triangle_area)
         new_points = triangle_point_picking(triangle_list[triangle_id_list])
-        # print(triangle_id_list, new_points)
         points = np.array(list(points) + list(new_points))
         are_on_allowed_surface = list(map(is_on_allowed_surface, points))
     return points
@@ -111,8 +103,6 @@ def surface_sampling(triangle_list, density, is_on_allowed_surface=lambda: True,
 
     # Compute a uniform sampling of the input mesh
     point_list = uniform_sample_mesh(triangle_list, tri_area, 4 * sample_count, is_on_allowed_surface)
-
-    # print(point_list)
 
     # Compute a blue noise sampling of the input mesh, seeded by the previous sampling
     point_list = blue_noise_sample_elimination(point_list, numpy.sum(tri_area), sample_count)

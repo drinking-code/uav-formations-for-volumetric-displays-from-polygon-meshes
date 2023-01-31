@@ -30,8 +30,7 @@ def calc_single_edge_sharpness(edge, faces):
         if len(matching_vertices) != 2:
             continue
 
-        t = ((c_x - a_x) * (b_x - a_x) + (c_y - a_y) * (b_y - a_y) + (c_z - a_z) * (b_z - a_z)) \
-            / \
+        t = ((c_x - a_x) * (b_x - a_x) + (c_y - a_y) * (b_y - a_y) + (c_z - a_z) * (b_z - a_z)) / \
             ((b_x - a_x) ** 2 + (b_y - a_y) ** 2 + (b_z - a_z) ** 2)
         intersection = [
             a_x + t * (b_x - a_x),
