@@ -7,7 +7,7 @@ from path_group_utils.group_connected import group_connected
 from path_group_utils.safe_placement_on_corners import safe_placement_on_corners
 
 
-def distribute_on_edges(edges, density, min_distance, explicit_terminators=None):
+def distribute_on_edges(edges, density, min_distance, explicit_terminators=None, new_point=None):
     """
     Calculates points to represent the given edges. It partitions edges into groups which have a terminator placed at
     each end. These terminators are placed where a line does not connect to any other line or connects to more than one
@@ -17,6 +17,7 @@ def distribute_on_edges(edges, density, min_distance, explicit_terminators=None)
     placed. The same edge with a density of 2 will have 6 points placed.
     :param min_distance:
     :param explicit_terminators: Explicitly place a point here. The returned list will not include these points
+    :param new_point: Function to be called after the coordinates of a new point are determined
     :return:
     """
     if explicit_terminators is None:
@@ -26,7 +27,15 @@ def distribute_on_edges(edges, density, min_distance, explicit_terminators=None)
     groups = [PathGroup(group) for group in groups]
 
     target_distance = max(min_distance, 1 / density)
-    vertices = safe_placement_on_corners(definite_terminators, non_terminators, groups, target_distance, min_distance)
+    points = []
+
+    def append_new_point(point):
+        points.append(point)
+        if new_point:
+            new_point(point)
+
+    safe_placement_on_corners(definite_terminators, non_terminators, groups,
+                              target_distance, min_distance, append_new_point)
 
     for path_group in groups:
         if not path_group.points_amount:
@@ -39,7 +48,7 @@ def distribute_on_edges(edges, density, min_distance, explicit_terminators=None)
             del percentage_steps[len(percentage_steps) - 1]
 
         for percentage in percentage_steps:
-            vertex = path_group.get_point_at_percent(percentage)
-            vertices.append(vertex)
+            point = path_group.get_point_at_percent(percentage)
+            append_new_point(point)
 
-    return vertices
+    return points
