@@ -16,13 +16,10 @@ def unique_vertices(faces):
 def unique_edges(faces):
     edges = []
     for face in faces:
+        face = list(face)
         for index, vertex_a in enumerate(face):
-            for vertex_b in face[index:]:
-                if vertex_a == vertex_b:
-                    continue
-                edge = [vertex_a, vertex_b]
-                is_in_edges = list_contains(edges, edge) or list_contains(edges, [vertex_b, vertex_a])
-                if is_in_edges:
-                    continue
-                edges.append(edge)
+            for vertex_b in face[index + 1:]:
+                edge = {vertex_a, vertex_b}
+                if not list_contains(edges, edge):
+                    edges.append(edge)
     return edges

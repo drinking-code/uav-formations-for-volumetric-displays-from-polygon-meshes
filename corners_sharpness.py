@@ -1,4 +1,5 @@
 from functools import reduce
+from pprint import pprint
 
 import numpy as np
 
@@ -22,7 +23,6 @@ def calc_single_corner_sharpness(vertex, faces):
     :param faces: list of lists which each contain all vertices forming a face
     :returns: sharpness value from 0 to 1
     """
-    vertex = list(vertex)
     connected_vertices = get_connected_vertices(vertex, faces)
     connected_vertices_angles = [
         angle_between_vectors_anchor(connected_vertex[0], connected_vertex[1], vertex)

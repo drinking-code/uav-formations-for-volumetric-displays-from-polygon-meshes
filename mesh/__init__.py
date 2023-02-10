@@ -9,25 +9,39 @@ from utils import return_value, recursive_list, recursive_tuple
 
 class Mesh:
     def __init__(self, data):
-        self.faces = recursive_list(data.vectors)
-        self.normals = recursive_list(data.normals)
-
-        self.vertices = calc_unique_vertices(self.faces)
+        faces = recursive_list(data.vectors)
+        self.vertices = calc_unique_vertices(faces)
         self.vertices_map: DoubleSidedMap = DoubleSidedMap(
-            {random.randint(0, 2 ** 32): edge for edge in self.vertices},
+            {random.randint(0, 2 ** 32): vertex for vertex in self.vertices},
             tuple
         )
-        # some vertices have multiple existence, i.e. different lists (instances) with same values
-        dedupe_verts_in_faces(self.vertices_map, self.faces)
 
-        self.edges = calc_unique_edges(self.faces)
+        self._faces = []
+        for face in faces:
+            face_ref = set()
+            for vertex in face:
+                face_ref.add(self.vertices_map[vertex])
+            self._faces.append(face_ref)
+
+        self._edges = None
+        self.edges_map = None
+        self.generate_edges_list()
+
+        self.vertex_data = {}
+        self.edge_data = {}
+
+    def generate_edges_list(self):
+        self._edges = calc_unique_edges(self._faces)
         self.edges_map: DoubleSidedMap = DoubleSidedMap(
             {random.randint(0, 2 ** 32): edge for edge in self.edges},
             recursive_tuple
         )
 
-        self.vertex_data = {}
-        self.edge_data = {}
+    def __getattr__(self, item):
+        if item == 'edges':
+            return [[self.vertices_map[ident] for ident in edge] for edge in self._edges]
+        elif item == 'faces':
+            return [[self.vertices_map[ident] for ident in face] for face in self._faces]
 
     def set_edge_data(self, dictionary, key, merge=True):
         """
