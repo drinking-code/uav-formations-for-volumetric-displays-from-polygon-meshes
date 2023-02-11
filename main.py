@@ -17,10 +17,10 @@ from pyplot_draw_mesh import draw_corner_sharpness, draw_edge_sharpness, draw_me
 from save_as_stl import save_as_stl
 from slice_mesh import slice_mesh
 from surface_sampling import surface_sampling
-from surface_sampling.points_on_surface_utils import area_of_radii_on_surface, is_not_near_points
+from surface_sampling.points_on_surface_utils import is_not_near_points, excluded_area_on_face
 from uav_formation import UAVFormation
 from unique_vertices import unique_vertices
-from utils import triangle_surface_area, recursive_tuple
+from utils import triangle_surface_area, recursive_tuple, find_in_iterable
 
 """
 todo
@@ -74,8 +74,15 @@ mesh.surface_area = np.sum([triangle_surface_area(face) for face in mesh.faces])
 """
 4.2 Distribute points on hard edges _while keeping distance to already generated points_
 """
-sharp_edges = mesh.find_edges(
-    lambda edge: mesh.get_edge_data('sharpness')[mesh.edges_map[edge]] > SHARPNESS_THRESHOLD,
+# sharp_edges = mesh.find_edges_refs(
+#     lambda edge: mesh.get_edge_data('sharpness')[tuple(edge)] > SHARPNESS_THRESHOLD,
+#     True
+# )
+sharp_edges = []
+find_in_iterable(
+    zip(mesh.edges, mesh._edges),
+    lambda edge_tuple: mesh.get_edge_data('sharpness')[tuple(edge_tuple[1])] > SHARPNESS_THRESHOLD,
+    lambda edge_tuple: sharp_edges.append(edge_tuple[0]),
     True
 )
 density_per_square_unit = MAX_AMOUNT_UAV / mesh.surface_area
@@ -92,17 +99,17 @@ wire_vertices = distribute_on_edges(
 5. Distribute points on faces including soft edges and corners (vertices) (bluse noise sampling) _while keeping
    distance to already generated points_
 """
-# todo: fix the triangle area bug
 # slice mesh along sharp edges
 slices = slice_mesh(mesh, list(sharp_edges))
 slices_vectors = [unique_vertices(mesh_slice) for mesh_slice in slices.values()]
 target_distance = max(MIN_DISTANCE, 1 / density_per_square_unit)
+sharp_edges_and_corners = formation[UAVFormation.positions].values()
 for mesh_slice in slices.values():
     points_on_slice = surface_sampling(
         mesh_slice,
         density_per_square_unit,
-        lambda point: is_not_near_points(point, list(sharp_vertices) + list(wire_vertices), target_distance),
-        area_of_radii_on_surface(list(sharp_vertices), wire_vertices, target_distance, mesh_slice)
+        lambda face: excluded_area_on_face(face, sharp_edges_and_corners, target_distance),
+        lambda point: is_not_near_points(point, sharp_edges_and_corners, target_distance),
     )
     for point in points_on_slice:
         formation.add_position(point)

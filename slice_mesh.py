@@ -1,6 +1,7 @@
 import random
 from pprint import pprint
 
+from unique_vertices import unique_edges
 from utils import list_contains
 
 
@@ -19,8 +20,9 @@ def slice_mesh(mesh, seams):
     slices = {}
     edges_index_of_slice = {}
     for face in mesh.faces:
-        edges_in_face = get_edges_of_face(face, mesh)
+        edges_in_face = unique_edges([face], True)
         edges_not_seams = list(filter(lambda edge: not list_contains(seams, edge), edges_in_face))
+        edges_not_seams = [[mesh.vertices_map[vertex] for vertex in edge] for edge in edges_not_seams]
         edges_not_seams = [mesh.edges_map[edge] for edge in edges_not_seams]
 
         # find adjacent (of placed faces) edges

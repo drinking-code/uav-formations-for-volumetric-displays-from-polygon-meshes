@@ -146,3 +146,7 @@ def point_line_segment_distance(point, line):
     perpendicular_distance = np.cross(np.subtract(point, line[0]), norm_tangent)
 
     return np.hypot(parallel_distance_clamped, np.linalg.norm(perpendicular_distance))
+
+
+def point_is_on_line_segment(point, line, error=1e-06):
+    return point_line_segment_distance(point, line) <= error

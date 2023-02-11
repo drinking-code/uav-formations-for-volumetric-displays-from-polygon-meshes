@@ -13,13 +13,13 @@ def unique_vertices(faces):
     return vertices
 
 
-def unique_edges(faces):
+def unique_edges(faces, make_lists = False):
     edges = []
     for face in faces:
         face = list(face)
         for index, vertex_a in enumerate(face):
             for vertex_b in face[index + 1:]:
-                edge = {vertex_a, vertex_b}
+                edge = [vertex_a, vertex_b] if make_lists else {vertex_a, vertex_b}
                 if not list_contains(edges, edge):
                     edges.append(edge)
     return edges

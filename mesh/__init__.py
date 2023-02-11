@@ -89,7 +89,7 @@ class Mesh:
         return translate_dict(self.vertex_data[key], self.vertices_map, tuple)
 
     from .mesh_vector_manipulation import replace_vertices
-    from .find_entries import find_vertex, find_edges, find_faces
+    from .find_entries import find_vertex, find_edges, find_edges_refs, find_faces
 
 
 def translate_dict(from_dict, key_key_map, to_key_transformation=return_value):
