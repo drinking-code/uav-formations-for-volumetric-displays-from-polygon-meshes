@@ -1,7 +1,6 @@
 from pprint import pprint
 
 from double_sided_dict import DoubleSidedMap
-from mesh.dedupe import dedupe_verts_in_faces
 from unique_vertices import unique_edges as calc_unique_edges, unique_vertices as calc_unique_vertices
 from utils import return_value, recursive_list, recursive_tuple
 
@@ -14,7 +13,6 @@ def id_from_coordinates(coordinates):
 
 
 class Mesh:
-
     def __init__(self, data):
         faces = recursive_list(data.vectors)
         self.vertices = calc_unique_vertices(faces)
