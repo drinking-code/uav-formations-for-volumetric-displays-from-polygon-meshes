@@ -67,24 +67,24 @@ sharp_vertices = mesh.find_vertex(
     lambda vertex: mesh.get_vertex_data('sharpness')[tuple(vertex)] > SHARPNESS_THRESHOLD,
     True
 )
-for vertex_id, vertex in sharp_vertices.items():
-    formation[vertex_id][UAVFormation.positions] = vertex
+for vertex in sharp_vertices:
+    formation.add_position(vertex)
 mesh.surface_area = np.sum([triangle_surface_area(face) for face in mesh.faces])
 
 """
 4.2 Distribute points on hard edges _while keeping distance to already generated points_
 """
 sharp_edges = mesh.find_edges(
-    lambda edge: mesh.get_edge_data('sharpness')[recursive_tuple(edge)] > SHARPNESS_THRESHOLD,
+    lambda edge: mesh.get_edge_data('sharpness')[mesh.edges_map[edge]] > SHARPNESS_THRESHOLD,
     True
 )
 density_per_square_unit = MAX_AMOUNT_UAV / mesh.surface_area
 density_per_unit = np.sqrt(density_per_square_unit)
 wire_vertices = distribute_on_edges(
-    list(sharp_edges.values()),
+    list(sharp_edges),
     density_per_unit,
     MIN_DISTANCE,
-    list(sharp_vertices.values()),
+    list(sharp_vertices),
     formation.add_position
 )
 
@@ -92,16 +92,17 @@ wire_vertices = distribute_on_edges(
 5. Distribute points on faces including soft edges and corners (vertices) (bluse noise sampling) _while keeping
    distance to already generated points_
 """
+# todo: fix the triangle area bug
 # slice mesh along sharp edges
-slices = slice_mesh(mesh, list(sharp_edges.values()))
+slices = slice_mesh(mesh, list(sharp_edges))
 slices_vectors = [unique_vertices(mesh_slice) for mesh_slice in slices.values()]
 target_distance = max(MIN_DISTANCE, 1 / density_per_square_unit)
 for mesh_slice in slices.values():
     points_on_slice = surface_sampling(
         mesh_slice,
         density_per_square_unit,
-        lambda point: is_not_near_points(point, list(sharp_vertices.values()) + list(wire_vertices), target_distance),
-        area_of_radii_on_surface(list(sharp_vertices.values()), wire_vertices, target_distance, mesh_slice)
+        lambda point: is_not_near_points(point, list(sharp_vertices) + list(wire_vertices), target_distance),
+        area_of_radii_on_surface(list(sharp_vertices), wire_vertices, target_distance, mesh_slice)
     )
     for point in points_on_slice:
         formation.add_position(point)
@@ -133,7 +134,6 @@ total_uav_amount = len(formation)
 # print(f'UAVs used / UAVs available: {total_uav_amount} / {MAX_AMOUNT_UAV}')
 # actual_density = total_uav_amount / mesh.surface_area
 # print(f'Actual density / Aimed density: {np.around(actual_density, 3)} / {np.around(density_per_square_unit, 3)}')
-# print()
 # print(f'UAVs too close to each other: {amount_too_close}')
 # print('Maximum smallest UAV distance / Average smallest UAV distance / MIN_DISTANCE: ' +
 #       f'{maximum_smallest_distance} / {avg_distance} / {MIN_DISTANCE}')

@@ -105,7 +105,7 @@ def find_in_iterable(iterable, is_desired, add_to_found, find_all=False):
 
 def find_one_in_iterable(iterable, is_desired):
     found = []
-    find_in_iterable(iterable, is_desired, lambda value: found.append(value))
+    find_in_iterable(iterable, is_desired, found.append)
     return found[0]
 
 

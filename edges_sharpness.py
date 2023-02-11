@@ -11,9 +11,8 @@ def calc_edge_sharpness(mesh):
     :returns: dictionary with sharpness value from 0 to 1 for each unique edge given in faces
     """
     sharpness_values = {
-        tuple(map(lambda vertex: tuple(vertex), edge)):
-            calc_single_edge_sharpness(edge, mesh.faces)
-        for edge in mesh.edges
+        tuple(edge): calc_single_edge_sharpness(vertices, mesh.faces)
+        for vertices, edge in zip(mesh.edges, mesh._edges)
     }
     return sharpness_values
 

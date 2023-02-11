@@ -2,114 +2,88 @@ from pprint import pprint
 
 import numpy as np
 
-from mesh.dedupe import dedupe_verts_in_edges, dedupe_verts_in_faces, remove_faces_duplicated_vertex, \
-    remove_edges_duplicated_vertex, gracefully_dedupe_edges
-from utils import replace_values_in_list, recursive_list, zip_common, recursive_tuple, list_contains
+from mesh import id_from_coordinates
+from utils import list_contains, find_in_iterable
 
 
-def move_vertex(self, vertex, target):
-    def edge_has_vertex(edge):
-        return list_contains(recursive_list(edge), vertex)
-
+def replace_vertices(self, vertices_group, target):
     target = list(target)
-    # get refs to vertex and delete key (baked tuple)
-    vertex_key = self.vertices_map[vertex]
-    vertex_ref = self.vertices_map[vertex_key]
-    # remove vertices that existed with the target coordinates to prevent duplicates
-    for vertex_id in self.vertices_map.find_by_value(lambda vertex: vertex == target, True):
-        del self.vertices_map[vertex_id]
-    del self.vertices_map[vertex_key]
-    # get edges with vertex and delete keys (baked tuples)
-    edges_with_vertex = self.edges_map.find_by_value(edge_has_vertex, True)
-    for edge_key in edges_with_vertex:
-        del self.edges_map[edge_key]
+    if list_contains(vertices_group, target):
+        raise NotImplementedError('Group of vertices cannot be replaced with one of itself.')
 
-    # change vertex values
-    replace_values_in_list(vertex_ref, target)
+    vertices_group_idents = [self.vertices_map[vertex] for vertex in vertices_group]
+    hashable_vertex = self.vertices_map.make_hashable
+    hashable_edge = self.edges_map.make_hashable
 
-    # reassign new vertex
-    self.vertices_map[vertex_key] = vertex_ref
-    # reassign new edges
-    for edge_key, edge_ref in edges_with_vertex.items():
-        self.edges_map[edge_key] = edge_ref
+    # add target vertex to mesh
+    self.vertices.append(target)
+    target_id = id_from_coordinates(target)
+    self.vertices_map[target_id] = target
 
+    # interpolate data of the vertices in "vertices_group" to find the new datapoint of "target"
+    for data_key in self.vertex_data:
+        new_value = np.average([self.get_vertex_data(data_key)[hashable_vertex(vertex)] for vertex in vertices_group])
+        self.set_vertex_data({hashable_vertex(target): new_value}, data_key)
 
-def replace_vertices(self, vertices, target):
-    # find and remove edges between given vectors
-    vertices = recursive_list(vertices)
-    edges_in_vector_group = []
+    def n_vertices_in_vertices_group(vertex_set):
+        vertices_shared_with_vertices_group = \
+            filter(lambda vertex: list_contains(vertices_group_idents, vertex), vertex_set)
+        return len(list(vertices_shared_with_vertices_group))
 
-    def interpolate_and_delete_data(data_source, key_id_map, value_keys):
-        values = {
-            data_key: [
-                data_source[data_key][key_id_map[value_key]]
-                for value_key in value_keys
-            ] for data_key in data_source
-        }
-        interpolated = {
-            data_key: np.average(values[data_key])
-            for data_key in values
-        }
-        for data_key in data_source:
-            for value_key in value_keys:
-                del data_source[data_key][key_id_map[value_key]]
-        return interpolated
-
-    vectors_interpolated = interpolate_and_delete_data(self.vertex_data, self.vertices_map, vertices)
-
-    for index, vertex_a in enumerate(vertices):
-        for vertex_b in vertices[index:]:
-            edge = None
-            if [vertex_a, vertex_b] in self.edges_map:
-                edge = self.edges_map[[vertex_a, vertex_b]]
-            if [vertex_b, vertex_a] in self.edges_map:
-                edge = self.edges_map[[vertex_b, vertex_a]]
-            if edge is None:
-                continue
-            edges_in_vector_group.append(edge)
-            for key in self.edge_data:
-                del self.edge_data[key][edge]
-
-    # find edges that contain one of the given vectors -> interpolate values
-    edges_half_in_vector_group = {}
-    # print(self.edges_map.value_key)
-    for edge_id, edge in self.edges_map:
-        # print('a', edge_id, edge)
-        edge = list(edge)
-        edge = self.edges_map[self.edges_map[edge]]
-        # print('b', self.edges_map[edge], edge)
-        existing_vector_filter = list(filter(lambda vertex: vertex in vertices, edge))
-        if len(existing_vector_filter) != 1:
+    # interpolate data of the edges that will be merged in this operation to find the data point of the merged edge
+    # (edges containing exactly one vertex from "vertices_group")
+    edges_common_vertex = {}
+    for edge in self._edges:
+        edge = tuple(edge)
+        is_in_group = [list_contains(vertices_group_idents, vertex) for vertex in edge]
+        if not any(is_in_group) or all(is_in_group):
             continue
-        edge_vector_outside_vectors = list(filter(lambda vertex: vertex != existing_vector_filter[0], edge))[0]
-        edge_vector_outside_vectors_tuple = tuple(edge_vector_outside_vectors)
-        if edge_vector_outside_vectors_tuple not in edges_half_in_vector_group:
-            edges_half_in_vector_group[edge_vector_outside_vectors_tuple] = []
-        edges_half_in_vector_group[edge_vector_outside_vectors_tuple].append(edge)
+        vertex_not_in_group = edge[is_in_group.index(False)]
+        if vertex_not_in_group not in edges_common_vertex:
+            edges_common_vertex[vertex_not_in_group] = []
+        edges_common_vertex[vertex_not_in_group].append(edge)
 
-    edges_half_in_vector_group_values = {}
-    for edge_vector_outside_vectors, edges in edges_half_in_vector_group.items():
-        edges_interpolated = interpolate_and_delete_data(self.edge_data, self.edges_map, edges)
-        edges_half_in_vector_group_values[edge_vector_outside_vectors] = edges_interpolated
+    merged_edges_data = {}
+    for vertex, edges in edges_common_vertex.items():
+        merged_edges_data[vertex] = {
+            data_key: np.average([self.get_edge_data(data_key)[edge] for edge in edges])
+            for data_key in self.edge_data
+        }
 
-    for vertex in vertices:
-        self.move_vertex(vertex, target)
+    # delete faces that contain more than one vertex from "vertices_group" will vanish
+    faces_to_delete = []
+    find_in_iterable(self._faces, lambda face: n_vertices_in_vertices_group(face) >= 2, faces_to_delete.append, True)
+    faces_to_delete.reverse()
+    for face in faces_to_delete:
+        del self._faces[self._faces.index(face)]
 
-    # dedupe (only keep one key from vertices)
-    dedupe_verts_in_faces(self.vertices_map, self.faces)
-    remove_faces_duplicated_vertex(self.faces)
-    dedupe_verts_in_edges(self.vertices_map, self.edges)
-    remove_edges_duplicated_vertex(self.edges, self.edges_map)
-    gracefully_dedupe_edges(self.edges, self.edges_map)
+    # bring the vertices to delete in the correct order to delete them
+    vertices_to_delete = []
+    find_in_iterable(self.vertices, lambda vertex: list_contains(vertices_group, vertex),
+                     vertices_to_delete.append, True)
+    vertices_to_delete.reverse()
+    for vertex in vertices_to_delete:
+        del self.vertices_map[vertex]
+        del self.vertices[self.vertices.index(vertex)]
 
-    # set new interpolated data
-    for key in vectors_interpolated:
-        self.set_vertex_data({tuple(self.vertices_map[self.vertices_map[target]]): vectors_interpolated[key]}, key)
+    # connect target vertex (replace all vertices in "vertices_group" with "target")
+    for face in self._faces:
+        face_list = list(face)
+        is_in_group = [list_contains(vertices_group_idents, vertex) for vertex in face_list]
+        if not (np.sum(is_in_group) == 1):
+            continue
+        vertex_in_group = face_list[is_in_group.index(True)]
+        face.remove(vertex_in_group)
+        face.add(target_id)
 
-    for key in list(edges_half_in_vector_group_values.values())[0]:
-        new_edge_data = {}
-        for edge_vector_outside_vectors, edges, data \
-                in zip_common(edges_half_in_vector_group, edges_half_in_vector_group_values):
-            for edge in edges:
-                new_edge_data[recursive_tuple(edge)] = data[key]
-        self.set_edge_data(new_edge_data, key)
+    # rebuild edge list, and edges map
+    self.generate_edges_list()
+
+    # insert new (interpolated) data for vertex and edges
+    for vertex, data in merged_edges_data.items():
+        edge_id = self.edges_map[(vertex, target_id)]
+        edge_tuple_in_correct_order = hashable_edge(self.edges_map[edge_id])
+        for data_key, value in data.items():
+            self.set_edge_data({edge_tuple_in_correct_order: value}, data_key)
+
+    # todo: garbage collect vertices data, edge data

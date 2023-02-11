@@ -4,14 +4,14 @@ from pprint import pprint
 from utils import list_contains
 
 
-def get_edges_of_face(face, edges_map):  # todo: fix: returns None sometimes
+def get_edges_of_face(face, mesh):  # todo: fix: returns None sometimes
     edges_in_face = []
     for index, vertex_a in enumerate(face):
         for vertex_b in face[index + 1:]:
-            edge = edges_map.find_by_value(
+            edge = mesh.find_edges(
                 lambda edge: list_contains(edge, vertex_a) and list_contains(edge, vertex_b)
             )
-            edges_in_face.append(list(edge.values())[0])
+            edges_in_face.append(edge[0])
     return edges_in_face
 
 
@@ -19,7 +19,7 @@ def slice_mesh(mesh, seams):
     slices = {}
     edges_index_of_slice = {}
     for face in mesh.faces:
-        edges_in_face = get_edges_of_face(face, mesh.edges_map)
+        edges_in_face = get_edges_of_face(face, mesh)
         edges_not_seams = list(filter(lambda edge: not list_contains(seams, edge), edges_in_face))
         edges_not_seams = [mesh.edges_map[edge] for edge in edges_not_seams]
 
