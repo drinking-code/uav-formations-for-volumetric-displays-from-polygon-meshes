@@ -1,3 +1,4 @@
+import math
 import random
 import sys
 from functools import reduce
@@ -14,6 +15,15 @@ class UAVFormation(CombinedDict):
         super().__init__([UAVFormation.positions, UAVFormation.colors])
 
     def __setitem__(self, key, value, category=None):
+        # todo: fix: comes from "safe_placement_on_corners" function
+        if is_iterable(value) and any(map(lambda coordinate: math.isnan(coordinate), list(value))):
+            return False
+        # todo
+        if category == UAVFormation.positions:
+            for position in self.data[UAVFormation.positions].values():
+                if is_iterable(position) and list(position) == list(value):
+                    return False
+
         result = super().__setitem__(key, value, category)
         if category == UAVFormation.positions:
             if not is_iterable(value) or len(value) != 3:

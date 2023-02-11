@@ -63,6 +63,7 @@ class PathGroup:
                 break
             length_copy -= path_length
             path_index += 1
+        path_index = min(path_index, len(self.paths) - 1)
         path = self.paths[path_index]
         is_reversed = (not list_contains(self.paths[path_index + 1], path[1])) \
             if path_index + 1 < len(self.paths) \
