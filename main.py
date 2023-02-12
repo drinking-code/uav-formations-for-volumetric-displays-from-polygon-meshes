@@ -104,6 +104,8 @@ slices = slice_mesh(mesh, list(sharp_edges))
 slices_vectors = [unique_vertices(mesh_slice) for mesh_slice in slices.values()]
 target_distance = max(MIN_DISTANCE, 1 / density_per_square_unit)
 sharp_edges_and_corners = formation[UAVFormation.positions].values()
+# print(target_distance, MIN_DISTANCE)
+# exit(0)
 for mesh_slice in slices.values():
     points_on_slice = surface_sampling(
         mesh_slice,

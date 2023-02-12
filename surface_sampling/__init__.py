@@ -35,7 +35,10 @@ def triangle_point_picking(triangle_list):
 
 def uniform_sample_mesh(triangle_list, triangle_area_list, sample_count, is_on_allowed_surface):
     # Normalize the sum of area of each triangle to 1
-    triangle_area = triangle_area_list / numpy.sum(triangle_area_list)
+    if numpy.sum(triangle_area_list) == 0:
+        triangle_area = 0
+    else:
+        triangle_area = triangle_area_list / numpy.sum(triangle_area_list)
 
     '''
     For each sample

@@ -20,8 +20,8 @@ class UAVFormation(CombinedDict):
             if not is_iterable(value) or len(value) != 3:
                 raise Exception(f'"value" for category `{UAVFormation.positions}` must be iterable of length 3.')
             iterable_strings = map(lambda a: str(a), value)
-            # sys.stdout.write(' '.join(iterable_strings) + '\n')
-            # sys.stdout.flush()
+            sys.stdout.write(' '.join(iterable_strings) + '\n')
+            sys.stdout.flush()
         return result
 
     def add_position(self, point):
