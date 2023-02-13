@@ -2,9 +2,9 @@ from pprint import pprint
 
 import numpy as np
 
-from path_group import PathGroup
-from path_group_utils.group_connected import group_connected
-from path_group_utils.safe_placement_on_corners import safe_placement_on_corners
+from .path_group import PathGroup
+from .path_group_utils.group_connected import group_connected
+from .path_group_utils.safe_placement_on_corners import safe_placement_on_corners
 
 
 def distribute_on_edges(edges, density, min_distance, explicit_terminators=None, new_point=None):

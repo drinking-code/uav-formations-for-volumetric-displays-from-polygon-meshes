@@ -1,6 +1,10 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import numpy as np
 
-from distribute_edges import PathGroup
+if TYPE_CHECKING:
+    from distribute_edges import PathGroup
 from utils import find_in_iterable, sphere_line_intersection
 
 
