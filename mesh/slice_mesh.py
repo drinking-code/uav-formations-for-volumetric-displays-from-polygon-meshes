@@ -1,8 +1,6 @@
 import random
-from pprint import pprint
 
-from unique_vertices import unique_edges
-from utils import list_contains
+from utils import list_contains, unique_edges
 
 
 def get_edges_of_face(face, mesh):  # todo: fix: returns None sometimes

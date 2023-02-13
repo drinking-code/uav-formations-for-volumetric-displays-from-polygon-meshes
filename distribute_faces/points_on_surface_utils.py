@@ -1,10 +1,8 @@
 import math
-from pprint import pprint
 
 import numpy as np
 
-from utils import recursive_list, point_is_on_line_segment, recursive_tuple
-from unique_vertices import unique_edges as calc_unique_edges
+from utils import recursive_list, point_is_on_line_segment, recursive_tuple, unique_edges as calc_unique_edges
 
 
 def is_not_near_points(point, points, distance):

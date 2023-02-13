@@ -1,8 +1,6 @@
 import numpy as np
 
-from angle import angle_between_vectors_anchor
-from unique_vertices import unique_edges as calc_unique_edges
-from utils import recursive_list, list_contains
+from utils import angle_between_vectors_anchor, list_contains
 
 
 def calc_edge_sharpness(mesh):

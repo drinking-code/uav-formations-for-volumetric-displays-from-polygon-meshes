@@ -2,7 +2,7 @@ import numpy as np
 from stl import mesh as np_stl, stl
 from icosphere import icosphere
 
-from uav_formation import UAVFormation
+from formation import UAVFormation
 
 
 def save_as_stl(formation, diameter):

@@ -1,6 +1,6 @@
 import numpy as np
 
-from path_group import PathGroup
+from distribute_edges import PathGroup
 from utils import find_in_iterable, sphere_line_intersection
 
 

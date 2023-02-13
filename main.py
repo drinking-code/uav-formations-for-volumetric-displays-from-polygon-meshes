@@ -1,26 +1,17 @@
 import json
-from functools import reduce
-from pprint import pprint
 from sys import argv
 import io
 
 import numpy as np
 from stl import mesh as np_stl
-import matplotlib.pyplot as plt
 
-from collapse_vertices import collapse_vertices
-from corners_sharpness import calc_corner_sharpness
-from distribute_on_edges import distribute_on_edges
-from edges_sharpness import calc_edge_sharpness
-from mesh import Mesh
-from pyplot_draw_mesh import draw_corner_sharpness, draw_edge_sharpness, draw_mesh_faces
+from sharpness import calc_corner_sharpness, calc_edge_sharpness
+from distribute_edges import distribute_on_edges
+from mesh import Mesh, slice_mesh, collapse_vertices
 from save_as_stl import save_as_stl
-from slice_mesh import slice_mesh
-from surface_sampling import surface_sampling
-from surface_sampling.points_on_surface_utils import is_not_near_points, excluded_area_on_face
-from uav_formation import UAVFormation
-from unique_vertices import unique_vertices
-from utils import triangle_surface_area, recursive_tuple, find_in_iterable
+from distribute_faces import surface_sampling, is_not_near_points, excluded_area_on_face
+from formation import UAVFormation
+from utils import triangle_surface_area, find_in_iterable, unique_vertices
 
 """
 todo
@@ -74,10 +65,6 @@ mesh.surface_area = np.sum([triangle_surface_area(face) for face in mesh.faces])
 """
 4.2 Distribute points on hard edges _while keeping distance to already generated points_
 """
-# sharp_edges = mesh.find_edges_refs(
-#     lambda edge: mesh.get_edge_data('sharpness')[tuple(edge)] > SHARPNESS_THRESHOLD,
-#     True
-# )
 sharp_edges = []
 find_in_iterable(
     zip(mesh.edges, mesh._edges),

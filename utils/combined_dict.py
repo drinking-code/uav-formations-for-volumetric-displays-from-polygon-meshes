@@ -1,4 +1,4 @@
-from utils import list_contains, force_get_item
+from utils import list_contains, get_item_or_return_none
 
 
 class CombinedDict:
@@ -20,7 +20,7 @@ class CombinedDict:
             return TempSubDict(self.data[item], lambda key, value: self.__setitem__(key, value, item))
         else:
             item_values = {
-                category: force_get_item(self.data[category], item)
+                category: get_item_or_return_none(self.data[category], item)
                 for category in self.categories
             }
             return TempSubDict(item_values, lambda category, value: self.__setitem__(item, value, category))
@@ -31,7 +31,7 @@ class CombinedDict:
                 if category == iter_category:
                     self.data[iter_category][key] = value
                 else:
-                    force_get_item(self.data[iter_category], key)
+                    get_item_or_return_none(self.data[iter_category], key)
         # todo
 
     def __str__(self):

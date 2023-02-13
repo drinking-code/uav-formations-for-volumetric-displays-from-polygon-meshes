@@ -1,12 +1,16 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from pprint import pprint
 
 import numpy as np
 
-from mesh import id_from_coordinates
+if TYPE_CHECKING:
+    from . import Mesh
 from utils import list_contains, find_in_iterable
 
 
-def replace_vertices(self, vertices_group, target):
+def replace_vertices(self: Mesh, vertices_group, target):
     target = list(target)
     if list_contains(vertices_group, target):
         raise NotImplementedError('Group of vertices cannot be replaced with one of itself.')
@@ -17,7 +21,7 @@ def replace_vertices(self, vertices_group, target):
 
     # add target vertex to mesh
     self.vertices.append(target)
-    target_id = id_from_coordinates(target)
+    target_id = self.id_from_coordinates(target)
     self.vertices_map[target_id] = target
 
     # interpolate data of the vertices in "vertices_group" to find the new datapoint of "target"

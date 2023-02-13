@@ -7,7 +7,7 @@ import numpy as np
 from scipy.spatial.distance import pdist, squareform
 from scipy.spatial import KDTree
 
-from utils import triangle_surface_area, recursive_list
+from utils import triangle_surface_area
 
 
 def mesh_area(triangle_list, excluded_area):

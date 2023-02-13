@@ -4,7 +4,7 @@ const fs = require('fs')
 
 const pythonBin = path.resolve('venv', 'bin', 'python')
 const pythonEntry = path.resolve('main.py')
-const mesh = fs.readFileSync('cube.stl', 'utf-8')
+const mesh = fs.readFileSync(path.join('example_meshes', 'cube.stl'), 'utf-8')
 const scriptOptions = JSON.stringify({
     max_amount: 500,
     min_distance: .3,

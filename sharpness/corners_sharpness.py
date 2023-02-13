@@ -1,11 +1,6 @@
-from functools import reduce
-from pprint import pprint
-
 import numpy as np
 
-from angle import angle_between_vectors_anchor
-from unique_vertices import unique_vertices as calc_unique_vertices
-from utils import lists_list_filter_contains, recursive_list
+from utils import angle_between_vectors_anchor, lists_list_filter_contains, recursive_list
 
 
 def calc_corner_sharpness(mesh):

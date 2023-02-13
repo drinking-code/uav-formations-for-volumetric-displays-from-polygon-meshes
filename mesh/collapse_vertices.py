@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import get_faces_with_vertex_dict, recursive_list, list_contains
+from utils import recursive_list, list_contains
 
 
 def collapse_vertices(mesh, sharpness_threshold, minimum_distance):
@@ -39,3 +39,19 @@ def collapse_vertices(mesh, sharpness_threshold, minimum_distance):
             collapsed_vertices.extend(vertex_group)
             middle_point = np.average(vertex_group, axis=0)
             mesh.replace_vertices(vertex_group, middle_point)
+
+
+def get_faces_with_vertex_dict(mesh):
+    """
+    Returns a dictionary with all occurring vertices as keys and a list of faces that include a vertex as values
+    :param mesh:
+    :return:
+    """
+    faces_with_vertex = {}
+    for face in mesh:
+        for vertex in face:
+            vertex = tuple(vertex)
+            if vertex not in faces_with_vertex:
+                faces_with_vertex[vertex] = []
+            faces_with_vertex[vertex].append(face)
+    return faces_with_vertex

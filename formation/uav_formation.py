@@ -1,9 +1,8 @@
 import math
 import random
 import sys
-from functools import reduce
 
-from combined_dict import CombinedDict
+from utils.combined_dict import CombinedDict
 from utils import is_iterable
 
 

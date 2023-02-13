@@ -1,6 +1,6 @@
 from pprint import pprint
 
-from utils import list_contains, recursive_list
+from utils import list_contains
 
 
 def group_connected(edges, explicit_terminators):
