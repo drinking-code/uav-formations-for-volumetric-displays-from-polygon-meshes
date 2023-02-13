@@ -27,5 +27,11 @@ Then, create a venv:
 python3.11 -m venv venv
 ```
 
+install the dependencies (after activating the venv):
+
+```shell
+pip install -r requirements.txt
+```
+
 and run the file (`node run.js`). It will invoke the python interpreter in the venv to run `main.py` with the contents
 of the .stl file as the first argument and the options in JSON format as the second.
