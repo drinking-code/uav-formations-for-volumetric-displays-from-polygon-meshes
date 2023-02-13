@@ -1,6 +1,4 @@
 # adapted from https://github.com/marmakoide/mesh-blue-noise-sampling
-from pprint import pprint
-
 import numpy
 import numpy as np
 
@@ -23,12 +21,12 @@ reflection = numpy.array([[0., -1.], [-1., 0.]])
 
 def triangle_point_picking(triangle_list):
     # Compute uniform distribution over [0, 1]x[0, 1] lower triangle
-    X = numpy.random.random((triangle_list.shape[0], 2))
-    t = numpy.sum(X, axis=1) > 1
-    X[t] = numpy.dot(X[t], reflection) + 1.
+    x = numpy.random.random((triangle_list.shape[0], 2))
+    t = numpy.sum(x, axis=1) > 1
+    x[t] = numpy.dot(x[t], reflection) + 1.
 
     # Map the [0, 1]x[0, 1] lower triangle to the actual triangles
-    ret = numpy.einsum('ijk,ij->ik', triangle_list[:, 1:] - triangle_list[:, 0, None], X)
+    ret = numpy.einsum('ijk,ij->ik', triangle_list[:, 1:] - triangle_list[:, 0, None], x)
     ret += triangle_list[:, 0]
     return ret
 
@@ -71,21 +69,21 @@ def uniform_sample_mesh(triangle_list, triangle_area_list, sample_count, is_on_a
 def blue_noise_sample_elimination(point_list, mesh_surface_area, sample_count):
     # Parameters
     alpha = 8
-    rmax = numpy.sqrt(mesh_surface_area / ((2 * sample_count) * numpy.sqrt(3.)))
+    r_max = numpy.sqrt(mesh_surface_area / ((2 * sample_count) * numpy.sqrt(3.)))
 
     # Compute a KD-tree of the input point list
     kdtree = KDTree(point_list)
 
     # Compute the weight for each sample
-    D = numpy.minimum(squareform(pdist(point_list)), 2 * rmax)
-    D = (1. - (D / (2 * rmax))) ** alpha
+    d = numpy.minimum(squareform(pdist(point_list)), 2 * r_max)
+    d = (1. - (d / (2 * r_max))) ** alpha
 
-    W = numpy.zeros(point_list.shape[0])
+    w = numpy.zeros(point_list.shape[0])
     for i in range(point_list.shape[0]):
-        W[i] = sum(D[i, j] for j in kdtree.query_ball_point(point_list[i], 2 * rmax) if i != j)
+        w[i] = sum(d[i, j] for j in kdtree.query_ball_point(point_list[i], 2 * r_max) if i != j)
 
     # Pick the samples we need
-    heap = sorted((w, i) for i, w in enumerate(W))
+    heap = sorted((w, i) for i, w in enumerate(w))
 
     id_set = set(range(point_list.shape[0]))
     while len(id_set) > sample_count:
@@ -93,9 +91,9 @@ def blue_noise_sample_elimination(point_list, mesh_surface_area, sample_count):
         w, i = heap.pop()
         id_set.remove(i)
 
-        neighbor_set = set(kdtree.query_ball_point(point_list[i], 2 * rmax))
+        neighbor_set = set(kdtree.query_ball_point(point_list[i], 2 * r_max))
         neighbor_set.remove(i)
-        heap = [(w - D[i, j], j) if j in neighbor_set else (w, j) for w, j in heap]
+        heap = [(w - d[i, j], j) if j in neighbor_set else (w, j) for w, j in heap]
         heap.sort()
 
     # Job done

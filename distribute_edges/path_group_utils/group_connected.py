@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from utils import list_contains
 
 

@@ -10,7 +10,7 @@ def calc_edge_sharpness(mesh):
     """
     sharpness_values = {
         tuple(edge): calc_single_edge_sharpness(vertices, mesh.faces)
-        for vertices, edge in zip(mesh.edges, mesh._edges)
+        for vertices, edge in zip(mesh.edges, mesh.edges_refs)
     }
     return sharpness_values
 

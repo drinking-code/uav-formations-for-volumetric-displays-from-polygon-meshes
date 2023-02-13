@@ -1,6 +1,3 @@
-import numpy as np
-
-
 def return_value(value):
     return value
 

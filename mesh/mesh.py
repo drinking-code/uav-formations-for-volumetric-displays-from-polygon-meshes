@@ -14,14 +14,14 @@ class Mesh:
             tuple
         )
 
-        self._faces: list[set] = []
+        self.faces_refs: list[set] = []
         for face in faces:
             face_ref = set()
             for vertex in face:
                 face_ref.add(self.vertices_map[vertex])
-            self._faces.append(face_ref)
+            self.faces_refs.append(face_ref)
 
-        self._edges = None
+        self.edges_refs = None
         self.edges_map = None
         self.generate_edges_list()
 
@@ -29,17 +29,17 @@ class Mesh:
         self.edge_data = {}
 
     def generate_edges_list(self):
-        self._edges = calc_unique_edges(self._faces)
+        self.edges_refs = calc_unique_edges(self.faces_refs)
         self.edges_map: DoubleSidedMap = DoubleSidedMap(
-            {self.id_from_coordinates(edge): edge for edge in self._edges},
+            {self.id_from_coordinates(edge): edge for edge in self.edges_refs},
             recursive_tuple
         )
 
     def __getattr__(self, item):
         if item == 'edges':
-            return [[self.vertices_map[ident] for ident in edge] for edge in self._edges]
+            return [[self.vertices_map[ident] for ident in edge] for edge in self.edges_refs]
         elif item == 'faces':
-            return [[self.vertices_map[ident] for ident in face] for face in self._faces]
+            return [[self.vertices_map[ident] for ident in face] for face in self.faces_refs]
 
     def set_edge_data(self, dictionary, key, merge=True):  # todo: make this CombinedDict??
         if merge is False:

@@ -8,7 +8,6 @@ from stl import mesh as np_stl
 from sharpness import calc_corner_sharpness, calc_edge_sharpness
 from distribute_edges import distribute_on_edges
 from mesh import Mesh, slice_mesh, collapse_vertices
-from save_as_stl import save_as_stl
 from distribute_faces import surface_sampling, is_not_near_points, excluded_area_on_face
 from formation import UAVFormation
 from utils import triangle_surface_area, find_in_iterable, unique_vertices
@@ -67,7 +66,7 @@ mesh.surface_area = np.sum([triangle_surface_area(face) for face in mesh.faces])
 """
 sharp_edges = []
 find_in_iterable(
-    zip(mesh.edges, mesh._edges),
+    zip(mesh.edges, mesh.edges_refs),
     lambda edge_tuple: mesh.get_edge_data('sharpness')[tuple(edge_tuple[1])] > SHARPNESS_THRESHOLD,
     lambda edge_tuple: sharp_edges.append(edge_tuple[0]),
     True
@@ -102,8 +101,6 @@ for mesh_slice in slices.values():
     )
     for point in points_on_slice:
         formation.add_position(point)
-
-save_as_stl(formation, .03)
 
 """
 7. (Optional) perform checks

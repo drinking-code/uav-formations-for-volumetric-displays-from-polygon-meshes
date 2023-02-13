@@ -11,8 +11,9 @@ from utils import find_in_iterable, sphere_line_intersection
 def safe_placement_on_corners(corners, non_corners, groups, target_distance, min_distance, append_new_point):
     vertices = []
 
-    for intersection in non_corners:
-        pass  # todo
+    # todo
+    # for intersection in non_corners:
+    #     pass
 
     for terminator in corners:
         path_groups: list[PathGroup] = []

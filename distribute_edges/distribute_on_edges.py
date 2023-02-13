@@ -1,5 +1,3 @@
-from pprint import pprint
-
 import numpy as np
 
 from .path_group import PathGroup

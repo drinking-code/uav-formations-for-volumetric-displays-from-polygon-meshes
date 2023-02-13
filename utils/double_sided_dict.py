@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from pprint import pprint
+from itertools import islice
 
 from utils import find_in_iterable
 
@@ -38,8 +38,10 @@ class DoubleSidedMap:
 
     def __getitem__(self, key):
         key_hashable = try_to_otherwise_return_value(self.make_hashable, key)
-        key_hashable_rev = try_to_otherwise_return_value(self.make_hashable, [key[1], key[0]]) \
-                           if isinstance(key, Iterable) else False
+        key_hashable_rev = try_to_otherwise_return_value(
+            self.make_hashable,
+            [next(islice(key, 1, None)), next(islice(key, 0, None))]
+        ) if isinstance(key, Iterable) else False
         if key_hashable in self.key_value or key_hashable in self.key_value_pointers:
             return (self.key_value_pointers[key_hashable]
                     if key_hashable in self.key_value_pointers

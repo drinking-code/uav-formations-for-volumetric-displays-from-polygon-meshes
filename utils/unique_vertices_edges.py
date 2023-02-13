@@ -13,7 +13,7 @@ def unique_vertices(faces):
     return vertices
 
 
-def unique_edges(faces, make_lists = False):
+def unique_edges(faces, make_lists=False):
     edges = []
     for face in faces:
         face = list(face)

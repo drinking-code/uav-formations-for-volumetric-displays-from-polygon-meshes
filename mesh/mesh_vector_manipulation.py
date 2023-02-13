@@ -1,8 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from pprint import pprint
-
 import numpy as np
 
 if TYPE_CHECKING:
@@ -37,7 +35,7 @@ def replace_vertices(self: Mesh, vertices_group, target):
     # interpolate data of the edges that will be merged in this operation to find the data point of the merged edge
     # (edges containing exactly one vertex from "vertices_group")
     edges_common_vertex = {}
-    for edge in self._edges:
+    for edge in self.edges_refs:
         edge = tuple(edge)
         is_in_group = [list_contains(vertices_group_idents, vertex) for vertex in edge]
         if not any(is_in_group) or all(is_in_group):
@@ -56,10 +54,15 @@ def replace_vertices(self: Mesh, vertices_group, target):
 
     # delete faces that contain more than one vertex from "vertices_group" will vanish
     faces_to_delete = []
-    find_in_iterable(self._faces, lambda face: n_vertices_in_vertices_group(face) >= 2, faces_to_delete.append, True)
+    find_in_iterable(
+        self.faces_refs,
+        lambda face: n_vertices_in_vertices_group(face) >= 2,
+        faces_to_delete.append,
+        True
+    )
     faces_to_delete.reverse()
     for face in faces_to_delete:
-        del self._faces[self._faces.index(face)]
+        del self.faces_refs[self.faces_refs.index(face)]
 
     # bring the vertices to delete in the correct order to delete them
     vertices_to_delete = []
@@ -71,7 +74,7 @@ def replace_vertices(self: Mesh, vertices_group, target):
         del self.vertices[self.vertices.index(vertex)]
 
     # connect target vertex (replace all vertices in "vertices_group" with "target")
-    for face in self._faces:
+    for face in self.faces_refs:
         face_list = list(face)
         is_in_group = [list_contains(vertices_group_idents, vertex) for vertex in face_list]
         if not (np.sum(is_in_group) == 1):
