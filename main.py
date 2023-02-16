@@ -12,11 +12,6 @@ from distribute_faces import surface_sampling, is_not_near_points, excluded_area
 from formation import UAVFormation
 from utils import triangle_surface_area, find_in_iterable, unique_vertices
 
-"""
-todo
-6. Map colors to points
-"""
-
 stl_contents = argv[1]
 options = json.loads(argv[2])
 
@@ -58,7 +53,7 @@ sharp_vertices = mesh.find_vertex(
     True
 )
 for vertex in sharp_vertices:
-    formation.add_position(vertex)
+    formation.add_position(vertex, UAVFormation.corner)
 mesh.surface_area = np.sum([triangle_surface_area(face) for face in mesh.faces])
 
 """
@@ -78,7 +73,7 @@ wire_vertices = distribute_on_edges(
     density_per_unit,
     MIN_DISTANCE,
     list(sharp_vertices),
-    formation.add_position
+    lambda point: formation.add_position(point, UAVFormation.edge)
 )
 
 """
@@ -100,7 +95,7 @@ for mesh_slice in slices.values():
         lambda point: is_not_near_points(point, sharp_edges_and_corners, target_distance),
     )
     for point in points_on_slice:
-        formation.add_position(point)
+        formation.add_position(point, UAVFormation.face)
 
 """
 7. (Optional) perform checks

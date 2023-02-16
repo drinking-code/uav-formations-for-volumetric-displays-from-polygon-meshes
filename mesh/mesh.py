@@ -67,8 +67,11 @@ class Mesh:
     def find_vertex(self, is_desired, find_all=False):
         return find_x(self.vertices, is_desired, find_all)
 
-    def find_edges(self, is_desired, find_all=False):
+    def find_edge(self, is_desired, find_all=False):
         return find_x(self.edges, is_desired, find_all)
+
+    def find_face(self, is_desired, find_all=False):
+        return find_x(self.faces, is_desired, find_all)
 
     def id_from_coordinates(self, coordinates):
         ident = 0

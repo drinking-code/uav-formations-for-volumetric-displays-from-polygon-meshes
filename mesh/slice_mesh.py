@@ -7,7 +7,7 @@ def get_edges_of_face(face, mesh):  # todo: fix: returns None sometimes
     edges_in_face = []
     for index, vertex_a in enumerate(face):
         for vertex_b in face[index + 1:]:
-            edge = mesh.find_edges(
+            edge = mesh.find_edge(
                 lambda edge: list_contains(edge, vertex_a) and list_contains(edge, vertex_b)
             )
             edges_in_face.append(edge[0])
