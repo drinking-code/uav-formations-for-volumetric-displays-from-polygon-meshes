@@ -7,6 +7,11 @@ see [here🔗](https://github.com/drinking-code/uav-formations-interface). Go th
 
 - Python 3.11
 - perhaps Node.js
+- bpy (you have to build yourself, see https://wiki.blender.org/wiki/Building_Blender/Other/BlenderAsPyModule ; this
+  repo assumes that the Python binary is at `blender-git/lib/darwin_arm64/python/bin/python3.10`. THis path may be
+  different for you, change it in [`normals/subprocess.py` (line 7)](normals/subprocess.py) if so. bpy is only needed
+  for generating normals during the calculation of illumination directionality. As an alternative to building Blender,
+  delete `illumination_directionality.py`. The webserver will skip calculating it.)
 
 ## Run the script by itself
 
@@ -24,4 +29,4 @@ pip install -r requirements.txt
 ```
 
 and run the file (`node run.js`). It will invoke the python interpreter in the venv to run `main.py` with the contents
-of `example_meshes/cube.stl` file as the first argument and example options in JSON format as the second.
+of `example_meshes/cube.stl` file as the first argument and example options in JSON format as the second. (If you want to run the script with a different .stl file / options, change [`run.js` at lines 7 and following](run.js).)
