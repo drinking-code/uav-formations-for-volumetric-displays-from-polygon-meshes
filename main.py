@@ -32,8 +32,8 @@ mesh = Mesh(mesh)
       deviation of this sum from 360° is the sharpness -> normalised with 0 - 360 => 1 - 0 and 360 - 720 => 0 - 1
 """
 sharpness_key = 'sharpness'
-mesh.set_vertex_data(calc_corner_sharpness(mesh), sharpness_key)
 mesh.set_edge_data(calc_edge_sharpness(mesh), sharpness_key)
+mesh.set_vertex_data(calc_corner_sharpness(mesh), sharpness_key)
 
 """
 3. Reduce hard corners that are too close

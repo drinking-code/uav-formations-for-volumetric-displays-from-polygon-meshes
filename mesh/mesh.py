@@ -80,7 +80,7 @@ class Mesh:
         return ident
 
 
-def translate_dict(from_dict, key_key_map, to_key_transformation=return_value):
+def translate_dict(from_dict, key_key_map, to_key_transformation=return_value) -> dict:
     to_dict = {}
     for from_key, value in from_dict.items():
         to_key = key_key_map[from_key]

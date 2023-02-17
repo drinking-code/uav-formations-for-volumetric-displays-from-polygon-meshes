@@ -64,12 +64,10 @@ for point_data in stdin:
         δ = vectors_plane_angle(edge_vector, face_on_p)
         if δ > 90:
             δ = 90 * 2 - δ
-        if δ > 45:
-            α = γ
-            β = 180
+        if δ < 45:
+            α, β = 180, γ
         else:
-            α = 180
-            β = γ
+            α, β = γ, 180
     elif position == 'c':
         faces = mesh.find_face(lambda face: list_contains(face, point), True)
         direction = np.average([normals[mesh.faces.index(face)] for face in faces], axis=0)
@@ -107,6 +105,7 @@ for point_data in stdin:
             ))
             vector, angle = sorted_vectors[0]
             return vector
+
 
         # todo: also seems inverted
         α = angle_between_vectors_anchor(smallest_angle_to_plane(t1, face_on_p), smallest_angle_to_plane(t2, face_on_p))
