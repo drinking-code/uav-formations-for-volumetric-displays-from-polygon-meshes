@@ -11,9 +11,7 @@ from stl import mesh as np_stl
 from mesh import Mesh
 from normals import run_normals_make_consistent_37
 from utils import point_is_on_face, point_is_on_line_segment, list_contains, angle_between_vectors_anchor, \
-    find_one_in_iterable
-from utils.algebra import vectors_plane_angle
-from utils.dihedral_angle import dihedral_angle_and_spines
+    find_one_in_iterable, barycenter_point_set, vectors_plane_angle, dihedral_angle_and_spines
 
 stl_contents = argv[1]
 options = json.loads(argv[2])
@@ -30,7 +28,7 @@ for point_data in stdin:
     if len(point_data_list) != 5:
         continue
 
-    id = point_data_list.pop(0)
+    ident = point_data_list.pop(0)
     position = point_data_list.pop(0)
     point = list(map(lambda value: float(value), point_data_list))
     if position == 'f':
@@ -70,7 +68,7 @@ for point_data in stdin:
             α, β = γ, 180
     elif position == 'c':
         faces = mesh.find_face(lambda face: list_contains(face, point), True)
-        direction = np.average([normals[mesh.faces.index(face)] for face in faces], axis=0)
+        direction = barycenter_point_set([normals[mesh.faces.index(face)] for face in faces])
         edges = mesh.find_edge(lambda edge: list_contains(edge, point), True)
         s = [np.subtract(find_one_in_iterable(edge, lambda vertex: vertex != point), point) for edge in edges]
         face_on_p = [point, np.add(point, direction), np.add(point, [0, 0, 1])]
@@ -114,6 +112,6 @@ for point_data in stdin:
     else:
         continue
 
-    stdout.write(f'{id} {" ".join([str(value) for value in direction])} {α} {β}')
+    stdout.write(f'{ident} {" ".join([str(value) for value in direction])} {α} {β}')
     stdout.write("\n")
     stdout.flush()
