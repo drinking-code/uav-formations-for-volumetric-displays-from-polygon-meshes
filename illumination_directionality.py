@@ -1,6 +1,7 @@
 import io
 import json
 import re
+import sys
 from collections import Counter
 from sys import argv, stdin, stdout
 
@@ -24,6 +25,8 @@ normals = run_normals_make_consistent_37(mesh.faces)
 newline_regex = re.compile(r"\n")
 for point_data in stdin:
     point_data = newline_regex.sub('', point_data)
+    if point_data == 'EXIT':
+        sys.exit(0)
     point_data_list = point_data.split(' ')
     if len(point_data_list) != 5:
         continue
@@ -69,6 +72,8 @@ for point_data in stdin:
     elif position == 'c':
         faces = mesh.find_face(lambda face: list_contains(face, point), True)
         direction = barycenter_point_set([normals[mesh.faces.index(face)] for face in faces])
+        if str(direction) == 'nan':  # isnan raises when ndarray is given
+            continue
         edges = mesh.find_edge(lambda edge: list_contains(edge, point), True)
         s = [np.subtract(find_one_in_iterable(edge, lambda vertex: vertex != point), point) for edge in edges]
         face_on_p = [point, np.add(point, direction), np.add(point, [0, 0, 1])]
@@ -101,13 +106,21 @@ for point_data in stdin:
                 [(vector, vectors_plane_angle(vector, plane)) for vector in vectors],
                 key=lambda data: (angle := data[1], angle)[1]
             ))
+            if not sorted_vectors:
+                return None
             vector, angle = sorted_vectors[0]
             return vector
 
 
-        α = angle_between_vectors_anchor(smallest_angle_to_plane(t1, face_on_p), smallest_angle_to_plane(t2, face_on_p))
+        t1_smallest = smallest_angle_to_plane(t1, face_on_p)
+        t2_smallest = smallest_angle_to_plane(t2, face_on_p)
+        α = angle_between_vectors_anchor(t1_smallest, t2_smallest) \
+            if t1_smallest is not None and t2_smallest is not None else 360 - 120
         α = 360 - α
-        β = angle_between_vectors_anchor(smallest_angle_to_plane(u1, face_on_q), smallest_angle_to_plane(u2, face_on_q))
+        u1_smallest = smallest_angle_to_plane(u1, face_on_q)
+        u2_smallest = smallest_angle_to_plane(u2, face_on_q)
+        β = angle_between_vectors_anchor(u1_smallest, t2_smallest) \
+            if u1_smallest is not None and u2_smallest is not None else 360 - 120
         β = 360 - β
     else:
         continue
