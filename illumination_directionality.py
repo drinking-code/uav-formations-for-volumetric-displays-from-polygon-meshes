@@ -57,8 +57,8 @@ for point_data in stdin:
             is_flipped_list = np.divide(spine_mean, direction)
             is_flipped_list_no_nan = list(filter(lambda value: not math.isnan(value), is_flipped_list))
             is_flipped = Counter(is_flipped_list_no_nan).most_common() == -1
-            if is_flipped:
-                γ = 360 - γ  # todo: hmmmmm: resulting values don't seem right (like inverted)
+            if not is_flipped:
+                γ = 360 - γ
         face_on_p = [point, np.add(point, direction), np.add(point, [0, 0, 1])]
         edge_vector = np.subtract(edge[1], edge[0])
         δ = vectors_plane_angle(edge_vector, face_on_p)
@@ -107,9 +107,10 @@ for point_data in stdin:
             return vector
 
 
-        # todo: also seems inverted
         α = angle_between_vectors_anchor(smallest_angle_to_plane(t1, face_on_p), smallest_angle_to_plane(t2, face_on_p))
+        α = 360 - α
         β = angle_between_vectors_anchor(smallest_angle_to_plane(u1, face_on_q), smallest_angle_to_plane(u2, face_on_q))
+        β = 360 - β
     else:
         continue
 

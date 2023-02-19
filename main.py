@@ -92,7 +92,7 @@ for mesh_slice in slices.values():
         mesh_slice,
         density_per_square_unit,
         lambda face: excluded_area_on_face(face, sharp_edges_and_corners, target_distance),
-        lambda point: is_not_near_points(point, sharp_edges_and_corners, target_distance),
+        lambda point: is_not_near_points(point, sharp_edges_and_corners, MIN_DISTANCE),
     )
     for point in points_on_slice:
         formation.add_position(point, UAVFormation.face)
